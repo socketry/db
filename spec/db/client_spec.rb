@@ -28,7 +28,10 @@ RSpec.describe DB::Client do
 	
 	it "can execute query" do
 		Async do
-			subject.call("SELECT 42 AS LIFE") do |result|
+			subject.call(<<~SQL * 100) do |result|
+				SELECT 42 AS LIFE;
+			SQL
+				puts "****************"
 				result.each do |row|
 					pp row
 				end
