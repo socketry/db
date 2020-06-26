@@ -55,9 +55,9 @@ module DB
 			@pool.close
 		end
 		
-		def call(*statement, **options, &block)
+		def query(statement, &block)
 			@pool.acquire do |connection|
-				connection.query(*statement, **options, &block)
+				connection.query(statement, &block)
 			end
 		end
 		

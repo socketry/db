@@ -34,7 +34,21 @@ module DB
 			end
 			
 			def query(string, &block)
-				@wrapper.query(string, &block)
+				@wrapper.send_query(string)
+				
+				if block_given?
+					while result = @wrapper.next_result
+						yield result
+					end
+				else
+					results = []
+					
+					while result = @wrapper.next_result
+						results << result
+					end
+					
+					return results
+				end
 			end
 		end
 	end
