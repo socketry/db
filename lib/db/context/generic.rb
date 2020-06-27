@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Huba Nagy.
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +21,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'db/client'
-require 'db/postgres/adapter'
-
-RSpec.describe DB::Client do
-	subject{DB::Client.new(DB::Postgres::Adapter.new)}
-	
-	it "can execute a query" do
-		Sync do
-			query = subject.call(<<~SQL * 10)
-				SELECT PG_SLEEP(0.1) AS LIFE;
-			SQL
-			
-			query.results do |result|
-				Console.logger.info(query) {"#{result.count} #{result.field_names}"}
-				result.each do |row|
-					Console.logger.info(result, row)
-				end
+module DB
+	module Context
+		class Generic
+			def initialize(pool)
+				@pool = pool
+				@connection = pool.acquire
 			end
-		end
-	end
-	
-	it "can execute a query in a transaction" do
-		Sync do
-			transaction = subject.transaction
 			
-			transaction.call(<<~SQL)
-				SELECT PG_SLEEP(0.1) AS LIFE;
-			SQL
-			
-			transaction.results do |result|
-				puts "**************** #{result.count} #{result.field_names}"
-				result.each do |row|
-					pp row
+			def close
+				if @connection
+					@pool.release(@connection)
+					@connection = nil
 				end
 			end
 			
-			transaction.commit
+			def write(query)
+				@connection.write(query)
+			end
+			
+			def read
+				@connection.read
+			end
+			
+			def call(query)
+				self.write(query)
+				
+				return self.read
+			end
 		end
 	end
 end

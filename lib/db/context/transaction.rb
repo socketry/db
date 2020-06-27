@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Huba Nagy.
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +21,70 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'db/client'
-require 'db/postgres/adapter'
+require_relative 'generic'
 
-RSpec.describe DB::Client do
-	subject{DB::Client.new(DB::Postgres::Adapter.new)}
-	
-	it "can execute a query" do
-		Sync do
-			query = subject.call(<<~SQL * 10)
-				SELECT PG_SLEEP(0.1) AS LIFE;
-			SQL
+module DB
+	module Context
+		class Transaction < Generic
+			def initialize(pool, statement)
+				super(pool)
+				
+				@finished = false
+				
+				@connection.call(statement)
+			end
 			
-			query.results do |result|
-				Console.logger.info(query) {"#{result.count} #{result.field_names}"}
-				result.each do |row|
-					Console.logger.info(result, row)
+			def commit
+				@connection.call("COMMIT")
+				self.close
+			end
+			
+			def abort
+				@connection.call("ROLLBACK")
+				self.close
+			end
+			
+			def savepoint(name)
+				@connection.call("SAVEPOINT #{name}")
+			end
+			
+			def rollback(name)
+				@connection.call("ROLLBACK #{name}")
+			end
+			
+			def close
+				self.flush
+				
+				super
+			end
+			
+			def call(statement, **options)
+				@connection.send_query(statement, **options)
+			end
+			
+			def results
+				while result = self.next_result
+					yield result
+				end
+			end
+			
+			def next_result
+				unless @finished
+					result = @connection.next_result
+					
+					if result
+						return result
+					else
+						return nil
+					end
+				end
+			end
+			
+			def flush
+				until @finished
+					@finished ||= @connection.next_result.nil?
 				end
 			end
 		end
 	end
-	
-	it "can execute a query in a transaction" do
-		Sync do
-			transaction = subject.transaction
-			
-			transaction.call(<<~SQL)
-				SELECT PG_SLEEP(0.1) AS LIFE;
-			SQL
-			
-			transaction.results do |result|
-				puts "**************** #{result.count} #{result.field_names}"
-				result.each do |row|
-					pp row
-				end
-			end
-			
-			transaction.commit
-		end
-	end
-end
+end 

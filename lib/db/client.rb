@@ -24,6 +24,9 @@ require 'async/io'
 require 'async/io/stream'
 require 'async/pool/controller'
 
+require_relative 'context/query'
+require_relative 'context/transaction'
+
 module DB
 	class Client
 		def initialize(adapter, **options)
@@ -55,10 +58,12 @@ module DB
 			@pool.close
 		end
 		
-		def query(statement, &block)
-			@pool.acquire do |connection|
-				connection.query(statement, &block)
-			end
+		def call(statement, **options)
+			Context::Query.new(@pool, statement, **options)
+		end
+		
+		def transaction(statement = "BEGIN")
+			Context::Transaction.new(@pool, statement)
 		end
 		
 		protected
