@@ -17,13 +17,13 @@ Gem::Specification.new do |spec|
 	spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 	spec.require_paths = ["lib"]
 	
-	spec.add_dependency "ffi-postgres"
 	spec.add_dependency "async-io"
 	spec.add_dependency "async-pool"
 	
 	spec.add_development_dependency "bake"
 	spec.add_development_dependency "bake-bundler"
 	
+	spec.add_development_dependency "covered"
 	spec.add_development_dependency "bundler", "~> 2.0"
 	spec.add_development_dependency "rspec", "~> 3.0"
 end

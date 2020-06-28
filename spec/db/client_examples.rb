@@ -20,19 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'covered/rspec'
-require 'bundler/setup'
-
-Bundler.require(:adapters)
-
-RSpec.configure do |config|
-	# Enable flags like --only-failures and --next-failure
-	config.example_status_persistence_file_path = ".rspec_status"
+RSpec.shared_examples_for DB::Client do |adapter|
+	subject{DB::Client.new(adapter)}
 	
-	# Disable RSpec exposing methods globally on `Module` and `main`
-	config.disable_monkey_patching!
+	it "can execute a query" do
+		Sync do
+			query = subject.call(<<~SQL * 2)
+				SELECT 42 AS LIFE;
+			SQL
+			
+			query.results do |result|
+				Console.logger.info(query) {"#{result.row_count} #{result.field_names}"}
+				result.each do |row|
+					Console.logger.info(result, row)
+				end
+			end
+		end
+	end
 	
-	config.expect_with :rspec do |c|
-		c.syntax = :expect
+	it "can execute a query in a transaction" do
+		Sync do
+			transaction = subject.transaction
+			
+			transaction.call(<<~SQL)
+				SELECT 42 AS LIFE;
+			SQL
+			
+			transaction.results do |result|
+				puts "**************** #{result.row_count} #{result.field_names}"
+				result.each do |row|
+					pp row
+				end
+			end
+			
+			transaction.commit
+		end
 	end
 end

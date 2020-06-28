@@ -21,42 +21,12 @@
 # THE SOFTWARE.
 
 require 'db/client'
-require 'db/postgres/adapter'
+require 'db/adapters'
 
-RSpec.describe DB::Client do
-	subject{DB::Client.new(DB::Postgres::Adapter.new)}
-	
-	it "can execute a query" do
-		Sync do
-			query = subject.call(<<~SQL * 10)
-				SELECT PG_SLEEP(0.1) AS LIFE;
-			SQL
-			
-			query.results do |result|
-				Console.logger.info(query) {"#{result.count} #{result.field_names}"}
-				result.each do |row|
-					Console.logger.info(result, row)
-				end
-			end
-		end
-	end
-	
-	it "can execute a query in a transaction" do
-		Sync do
-			transaction = subject.transaction
-			
-			transaction.call(<<~SQL)
-				SELECT PG_SLEEP(0.1) AS LIFE;
-			SQL
-			
-			transaction.results do |result|
-				puts "**************** #{result.count} #{result.field_names}"
-				result.each do |row|
-					pp row
-				end
-			end
-			
-			transaction.commit
-		end
+require_relative 'client_examples'
+
+DB::Adapters.each do |name, klass|
+	RSpec.describe klass do
+		include_examples DB::Client, klass.new
 	end
 end
