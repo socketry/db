@@ -58,12 +58,38 @@ module DB
 			@pool.close
 		end
 		
-		def call(statement, **options)
-			Context::Query.new(@pool, statement, **options)
+		def call(statement = nil, **options)
+			query = Context::Query.new(@pool, **options)
+			
+			if statement
+				query.send_query(statement)
+			end
+			
+			return query unless block_given?
+			
+			begin
+				yield query
+			ensure
+				query.close
+			end
 		end
 		
-		def transaction(statement = "BEGIN")
-			Context::Transaction.new(@pool, statement)
+		def transaction(statement = "BEGIN", **options)
+			transaction = Context::Transaction.new(@pool, **options)
+			
+			if statement
+				transaction.call("BEGIN")
+			end
+			
+			return transaction unless block_given?
+			
+			begin
+				yield transaction
+				
+				transaction.commit
+			ensure
+				transaction.abort if $!
+			end
 		end
 		
 		protected

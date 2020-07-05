@@ -21,49 +21,52 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'generic'
-
 module DB
 	module Context
-		class Query < Generic
-			def initialize(pool, statement, **options)
-				super(pool)
-				
-				@finished = false
-				
+		class Query
+			def initialize(pool)
+				@pool = pool
+				@connection = pool.acquire
+			end
+			
+			attr :connection
+			
+			def close
+				if @connection
+					self.flush
+					
+					@pool.release(@connection)
+					
+					@connection = nil
+				end
+			end
+			
+			def send_query(statement, **options)
 				@connection.send_query(statement, **options)
 			end
 			
-			def close
-				self.flush
+			def next_result
+				@connection.next_result
+			end
+			
+			def call(statement, **options)
+				@connection.send_query(statement, **options)
 				
-				super
+				return @connection.next_result
 			end
 			
 			def results
 				while result = self.next_result
 					yield result
 				end
-			end
-			
-			def next_result
-				unless @finished
-					result = @connection.next_result
-					
-					if result
-						return result
-					else
-						@finished = true
-						return nil
-					end
-				end
+				
+				return nil
 			end
 			
 			def flush
-				until @finished
-					@finished ||= @connection.next_result.nil?
+				until @connection.next_result.nil?
 				end
 			end
 		end
 	end
-end 
+end

@@ -27,6 +27,6 @@ require_relative 'client_examples'
 
 DB::Adapters.each do |name, klass|
 	RSpec.describe klass do
-		include_examples DB::Client, klass.new
+		include_examples DB::Client, klass.new(database: 'test')
 	end
 end

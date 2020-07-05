@@ -21,69 +21,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'generic'
+require_relative 'query'
 
 module DB
 	module Context
-		class Transaction < Generic
+		class Transaction < Query
 			def initialize(pool, statement)
 				super(pool)
-				
-				@finished = false
-				
-				@connection.call(statement)
 			end
 			
 			def commit
-				@connection.call("COMMIT")
+				self.call("COMMIT")
 				self.close
 			end
 			
 			def abort
-				@connection.call("ROLLBACK")
+				self.call("ROLLBACK")
 				self.close
 			end
 			
 			def savepoint(name)
-				@connection.call("SAVEPOINT #{name}")
+				self.call("SAVEPOINT #{name}")
 			end
 			
 			def rollback(name)
-				@connection.call("ROLLBACK #{name}")
-			end
-			
-			def close
-				self.flush
-				
-				super
-			end
-			
-			def call(statement, **options)
-				@connection.send_query(statement, **options)
-			end
-			
-			def results
-				while result = self.next_result
-					yield result
-				end
-			end
-			
-			def next_result
-				unless @finished
-					result = @connection.next_result
-					
-					if result
-						return result
-					else
-						return nil
-					end
-				end
-			end
-			
-			def flush
-				until @finished
-					@finished ||= @connection.next_result.nil?
-				end
+				self.call("ROLLBACK #{name}")
 			end
 		end
 	end

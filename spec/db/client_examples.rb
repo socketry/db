@@ -30,9 +30,8 @@ RSpec.shared_examples_for DB::Client do |adapter|
 			SQL
 			
 			query.results do |result|
-				Console.logger.info(query) {"#{result.row_count} #{result.field_names}"}
 				result.each do |row|
-					Console.logger.info(result, row)
+					expect(row).to be == [42]
 				end
 			end
 		end
@@ -42,18 +41,43 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		Sync do
 			transaction = subject.transaction
 			
-			transaction.call(<<~SQL)
+			result = transaction.call(<<~SQL)
 				SELECT 42 AS LIFE;
 			SQL
 			
-			transaction.results do |result|
-				puts "**************** #{result.row_count} #{result.field_names}"
-				result.each do |row|
-					pp row
-				end
-			end
+			expect(result.to_a).to be == [[42]]
 			
 			transaction.commit
+		end
+	end
+	
+	context 'with events table' do
+		before do
+			Sync do
+				transaction = subject.transaction
+				
+				transaction.call("DROP TABLE IF EXISTS events")
+				
+				transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.id_column}, created_at TIMESTAMP NOT NULL, description TEXT)")
+				
+				transaction.commit
+			end
+		end
+		
+		it 'can insert rows with timestamps' do
+			Sync do
+				subject.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')").close
+				
+				query = subject.call('SELECT * FROM events')
+				
+				rows = nil
+				
+				query.results do |result|
+					rows = result.to_a
+				end
+				
+				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), "Hello World"]]
+			end
 		end
 	end
 end
