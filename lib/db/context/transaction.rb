@@ -26,10 +26,6 @@ require_relative 'query'
 module DB
 	module Context
 		class Transaction < Query
-			def initialize(pool, statement)
-				super(pool)
-			end
-			
 			def commit
 				self.call("COMMIT")
 				self.close
