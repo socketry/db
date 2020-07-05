@@ -56,7 +56,7 @@ jobs:
         sudo apt-get install libmariadb-dev
         sudo systemctl start mysql
         mysql -uroot -proot -e "STATUS"
-        mysql -uroot -proot -e "CREATE USER 'testing'@'localhost'; GRANT ALL ON *.* TO 'testing'@'localhost'; FLUSH PRIVILEGES; CREATE DATABASE test;"
+        mysql -uroot -proot -e "CREATE USER '$(id -un)'@'localhost'; GRANT ALL ON *.* TO '$(id -un)'@'localhost'; FLUSH PRIVILEGES; CREATE DATABASE test;"
     
     - name: Run tests
       timeout-minutes: 5
