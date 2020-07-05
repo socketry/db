@@ -5,5 +5,5 @@ gemspec
 
 group :adapters do
 	gem "db-postgres"#, path: "../db-postgres"
-	gem "db-mysql"#, path: "../db-mysql"
+	gem "db-mariadb"#, path: "../db-mariadb"
 end
