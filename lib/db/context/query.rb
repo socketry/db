@@ -24,7 +24,7 @@
 module DB
 	module Context
 		class Query
-			def initialize(pool)
+			def initialize(pool, **options)
 				@pool = pool
 				@connection = pool.acquire
 			end
