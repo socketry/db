@@ -4,31 +4,61 @@ on: [push, pull_request]
 
 jobs:
   test:
+    runs-on: ${{matrix.os}}-latest
+    continue-on-error: ${{matrix.experimental}}
+    
     strategy:
       matrix:
         os:
           - ubuntu
-          - macos
         
         ruby:
-          - 2.4
           - 2.5
           - 2.6
           - 2.7
         
+        experimental: [false]
+        env: [""]
+        
         include:
-          - os: 'ubuntu'
-            ruby: '2.6'
-            env: COVERAGE=PartialSummary,Coveralls
-    
-    runs-on: ${{matrix.os}}-latest
+          - os: ubuntu
+            ruby: truffleruby
+            experimental: true
+          - os: ubuntu
+            ruby: jruby
+            experimental: true
+            env: JRUBY_OPTS="--debug -X+O"
+          - os: ubuntu
+            ruby: head
+            experimental: true
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}
+    
     - name: Install dependencies
-      run: bundle install
+      run: ${{matrix.env}} bundle install
+    
+    - name: Preparing Postgres (ubuntu)
+      if: matrix.os == 'ubuntu'
+      run: |
+        sudo apt-get install postgresql postgresql-contrib
+        echo "local all all trust" | sudo tee -a /var/lib/postgresql/12/main/pg_hba.conf
+        sudo systemctl restart postgresql
+        sudo -u postgres createuser -s -d $(id -un)
+        sudo -u postgres createdb test
+    
+    - name: Preparing MariaDB (ubuntu)
+      if: matrix.os == 'ubuntu'
+      run: |
+        sudo apt-get install libmariadb-dev
+        sudo systemctl start mysql
+        mysql -uroot -proot -e "STATUS"
+        mysql -uroot -proot -e "CREATE USER 'testing'@'localhost'; GRANT ALL ON *.* TO 'testing'@'localhost'; FLUSH PRIVILEGES; CREATE DATABASE test;"
+    
     - name: Run tests
-      run: ${{matrix.env}} bundle exec rspec
+      timeout-minutes: 5
+      run: |
+        ${{matrix.env}} bundle exec rspec
