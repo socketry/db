@@ -8,4 +8,8 @@ group :adapters do
 	gem "db-mariadb"#, path: "../db-mariadb"
 end
 
-gem "benchmark-ips"
+group :benchmark do
+	gem "benchmark-ips"
+	gem "mysql2"
+	gem "pg"
+end

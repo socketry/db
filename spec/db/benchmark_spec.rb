@@ -26,25 +26,50 @@ require 'async'
 require 'db/client'
 require 'db/adapters'
 
+require 'mysql2'
+require 'pg'
+
 RSpec.describe DB::Client do
 	it "should be fast to insert data" do
 		Benchmark.ips do |x|
 			DB::Adapters.each do |name, klass|
-				x.report(name) do |repeats|
+				adapter = klass.new(database: 'test')
+				client = DB::Client.new(adapter)
+				
+				Sync do
+					session = client.call
+					
+					session.call("DROP TABLE IF EXISTS benchmark")
+					session.call("CREATE TABLE benchmark (#{session.connection.id_column}, i INTEGER)")
+				end
+				
+				x.report("db-#{name}") do |repeats|
 					Sync do
-						client = klass.new(database: 'test')
-						
-						transaction = client.transaction
-						
-						transaction.call("DROP TABLE IF EXISTS benchmark")
-						transaction.call("CREATE TABLE bencmark (#{transaction.connection.id_column}, index INTEGER)")
-						
-						transaction.commit
+						session = client.call
+						session.call('TRUNCATE benchmark')
 						
 						repeats.times do |index|
-							client.query("INSERT INTO benchmark (index) VALUES (#{index})")
+							session.call("INSERT INTO benchmark (i) VALUES (#{index})")
 						end
 					end
+				end
+			end
+			
+			x.report('mysql2') do |repeats|
+				client = Mysql2::Client.new(database: 'test')
+				client.query('TRUNCATE benchmark')
+				
+				repeats.times do |index|
+					client.query("INSERT INTO benchmark (i) VALUES (#{index})")
+				end
+			end
+			
+			x.report('pg') do |repeats|
+				client = PG.connect(dbname: 'test')
+				client.exec('TRUNCATE benchmark')
+				
+				repeats.times do |index|
+					client.exec("INSERT INTO benchmark (i) VALUES (#{index})")
 				end
 			end
 			
