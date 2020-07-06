@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
-# Copyright, 2018, by Huba Nagy.
+# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,20 +25,24 @@ require_relative 'query'
 module DB
 	module Context
 		class Transaction < Query
+			# Commit the transaction and return the connection to the connection pool.
 			def commit
 				self.call("COMMIT")
 				self.close
 			end
 			
+			# Abort the transaction and return the connection to the connection pool.
 			def abort
 				self.call("ROLLBACK")
 				self.close
 			end
 			
+			# Mark a savepoint in the transaction.
 			def savepoint(name)
 				self.call("SAVEPOINT #{name}")
 			end
 			
+			# Return back to a previously registered savepoint.
 			def rollback(name)
 				self.call("ROLLBACK #{name}")
 			end

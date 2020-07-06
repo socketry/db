@@ -28,36 +28,30 @@ require_relative 'context/query'
 require_relative 'context/transaction'
 
 module DB
+	# Binds a connection pool to the specified adapter.
 	class Client
+		# Initialize the client and internal connection pool using the specified adapter.
+		# @parameter adapter [Object] The adapter instance.
 		def initialize(adapter, **options)
 			@adapter = adapter
 			
 			@pool = connect(**options)
 		end
 		
-		attr :endpoint
-		attr :protocol
+		# The adapter used for making connections.
+		# @attribute [Object]
+		attr :adapter
 		
-		# @return [client] if no block provided.
-		# @yield [client, task] yield the client in an async task.
-		def self.open(*arguments, &block)
-			client = self.new(*arguments)
-			
-			return client unless block_given?
-			
-			Async do |task|
-				begin
-					yield client, task
-				ensure
-					client.close
-				end
-			end.wait
-		end
-		
+		# Close all open connections in the connection pool.
 		def close
 			@pool.close
 		end
 		
+		# Acquires a connection and sends the specified statement if given.
+		# @parameters statement [String | Nil] An optional statement to send.
+		# @yields {|session| ...} A connected session if a block is given. Implicitly closed.
+		# 	@parameter session [Context::Query]
+		# @returns [Context::Query] A connected session if no block is given.
 		def call(statement = nil, **options)
 			query = Context::Query.new(@pool, **options)
 			
@@ -74,6 +68,11 @@ module DB
 			end
 		end
 		
+		# Acquires a connection and starts a transaction.
+		# @parameters statement [String | Nil] An optional statement to send. Defaults to `"BEGIN"`.
+		# @yields {|session| ...} A connected session if a block is given. Implicitly commits, or aborts the connnection if an exception is raised.
+		# 	@parameter session [Context::Transaction]
+		# @returns [Context::Transaction] A connected and started transaction if no block is given.
 		def transaction(statement = "BEGIN", **options)
 			transaction = Context::Transaction.new(@pool, **options)
 			

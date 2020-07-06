@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
-# Copyright, 2018, by Huba Nagy.
+# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +22,18 @@
 
 module DB
 	module Context
+		# A connected context for sending queries and reading results.
 		class Query
+			# Iniitalize the query context attached to the given connection pool.
 			def initialize(pool, **options)
 				@pool = pool
 				@connection = pool.acquire
 			end
 			
+			# The underlying connection.
 			attr :connection
 			
+			# Flush the connection and then return it to the connection pool.
 			def close
 				if @connection
 					self.flush
@@ -41,20 +44,29 @@ module DB
 				end
 			end
 			
+			# Send a query to the server.
+			# @parameter statement [String] The SQL query to send.
 			def send_query(statement, **options)
 				@connection.send_query(statement, **options)
 			end
 			
+			# Read the next result. Sending a query usually generates 1 or more results.
+			# @returns [Enumerable] The resulting records.
 			def next_result
 				@connection.next_result
 			end
 			
+			# Send a query to the server and read the next result.
+			# @returns [Enumerable] The resulting records.
 			def call(statement, **options)
 				@connection.send_query(statement, **options)
 				
 				return @connection.next_result
 			end
 			
+			# Enumerate all results.
+			# @yields {|result ...} The results if a block is given.
+			# 	@parameter result [Enumerable]
 			def results
 				while result = self.next_result
 					yield result
@@ -63,6 +75,7 @@ module DB
 				return nil
 			end
 			
+			# Flush all outstanding results.
 			def flush
 				until @connection.next_result.nil?
 				end
