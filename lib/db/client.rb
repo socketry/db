@@ -52,7 +52,7 @@ module DB
 		# @yields {|session| ...} A connected session if a block is given. Implicitly closed.
 		# 	@parameter session [Context::Session]
 		# @returns [Context::Session] A connected session if no block is given.
-		def call(statement = nil, **options)
+		def session(statement = nil, **options)
 			session = Context::Session.new(@pool, **options)
 			
 			if statement

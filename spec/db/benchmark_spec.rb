@@ -37,7 +37,7 @@ RSpec.describe DB::Client do
 				client = DB::Client.new(adapter)
 				
 				Sync do
-					session = client.call
+					session = client.session
 					
 					session.call("DROP TABLE IF EXISTS benchmark")
 					session.call("CREATE TABLE benchmark (#{session.connection.id_column}, i INTEGER)")
@@ -45,7 +45,7 @@ RSpec.describe DB::Client do
 				
 				x.report("db-#{name}") do |repeats|
 					Sync do
-						session = client.call
+						session = client.session
 						session.call('TRUNCATE benchmark')
 						
 						repeats.times do |index|
@@ -94,7 +94,7 @@ RSpec.describe DB::Client do
 				client = DB::Client.new(adapter)
 				
 				Sync do
-					session = client.call
+					session = client.session
 					
 					session.call("DROP TABLE IF EXISTS benchmark")
 					session.call("CREATE TABLE benchmark (#{session.connection.id_column}, i INTEGER)")
@@ -104,7 +104,7 @@ RSpec.describe DB::Client do
 				
 				x.report("db-#{name}") do |repeats|
 					Sync do
-						session = client.call
+						session = client.session
 						
 						repeats.times do |index|
 							result = session.call('SELECT * FROM benchmark')

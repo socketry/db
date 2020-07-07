@@ -46,13 +46,22 @@ module DB
 				end
 			end
 			
-			def < part
-				Query.new(self) < part
+			def clause(*arguments)
+				Query.new(self).clause(*arguments)
+			end
+			
+			def query(fragment, **parameters)
+				if parameters.empty?
+					Query.new(self).clause(fragment)
+				else
+					Query.new(self).interpolate(fragment, **parameters)
+				end
 			end
 			
 			# Send a query to the server.
 			# @parameter statement [String] The SQL query to send.
 			def send_query(statement, **options)
+				# Console.logger.info(self, statement)
 				@connection.send_query(statement, **options)
 			end
 			
@@ -65,6 +74,7 @@ module DB
 			# Send a query to the server and read the next result.
 			# @returns [Enumerable] The resulting records.
 			def call(statement, **options)
+				# Console.logger.info(self, statement)
 				@connection.send_query(statement, **options)
 				
 				return @connection.next_result
