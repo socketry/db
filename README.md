@@ -1,6 +1,6 @@
 # DB
 
-Provdes event-driven asynchronous drivers for various database adaptors, including [Postgres](https://github.com/socketry/db-postgres) and [MariaDB/MySQL](https://github.com/socketry/db-mariadb).
+Provides event-driven asynchronous drivers for various database adaptors, including [Postgres](https://github.com/socketry/db-postgres) and [MariaDB/MySQL](https://github.com/socketry/db-mariadb).
 
 [![Development Status](https://github.com/socketry/db/workflows/Development/badge.svg)](https://github.com/socketry/db/actions?workflow=Development)
 
