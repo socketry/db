@@ -76,4 +76,63 @@ RSpec.describe DB::Client do
 			x.compare!
 		end
 	end
+	
+	it "should be fast to select data" do
+		row_count = 100
+		insert_query = +"INSERT INTO benchmark (i) VALUES"
+		
+		row_count.times.map do |index|
+			insert_query <<  " (#{index}),"
+		end
+		
+		# Remove last comma:
+		insert_query.chop!
+		
+		Benchmark.ips do |x|
+			DB::Adapters.each do |name, klass|
+				adapter = klass.new(database: 'test')
+				client = DB::Client.new(adapter)
+				
+				Sync do
+					session = client.call
+					
+					session.call("DROP TABLE IF EXISTS benchmark")
+					session.call("CREATE TABLE benchmark (#{session.connection.id_column}, i INTEGER)")
+					
+					session.call(insert_query)
+				end
+				
+				x.report("db-#{name}") do |repeats|
+					Sync do
+						session = client.call
+						
+						repeats.times do |index|
+							result = session.call('SELECT * FROM benchmark')
+							expect(result.to_a).to have_attributes(size: row_count)
+						end
+					end
+				end
+			end
+			
+			x.report('mysql2') do |repeats|
+				client = Mysql2::Client.new(database: 'test')
+				
+				repeats.times do |index|
+					result = client.query('SELECT * FROM benchmark')
+					expect(result.to_a).to have_attributes(size: row_count)
+				end
+			end
+			
+			x.report('pg') do |repeats|
+				client = PG.connect(dbname: 'test')
+				
+				repeats.times do |index|
+					result = client.exec('SELECT * FROM benchmark')
+					expect(result.to_a).to have_attributes(size: row_count)
+				end
+			end
+			
+			x.compare!
+		end
+	end
 end
