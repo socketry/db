@@ -58,7 +58,7 @@ RSpec.shared_examples_for DB::Client do |adapter|
 				
 				transaction.call("DROP TABLE IF EXISTS events")
 				
-				transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.id_column}, created_at TIMESTAMP NOT NULL, description TEXT)")
+				transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.id_column}, created_at TIMESTAMP NOT NULL, description TEXT NULL)")
 				
 				transaction.commit
 			end
@@ -77,6 +77,22 @@ RSpec.shared_examples_for DB::Client do |adapter|
 				end
 				
 				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), "Hello World"]]
+			end
+		end
+		
+		it 'can insert null fields' do
+			Sync do
+				subject.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)").close
+				
+				query = subject.call('SELECT * FROM events')
+				
+				rows = nil
+				
+				query.results do |result|
+					rows = result.to_a
+				end
+				
+				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), nil]]
 			end
 		end
 	end
