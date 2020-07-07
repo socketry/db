@@ -4,6 +4,11 @@ Provdes event-driven asynchronous drivers for various database adaptors, includi
 
 [![Development Status](https://github.com/socketry/db/workflows/Development/badge.svg)](https://github.com/socketry/db/actions?workflow=Development)
 
+## Features
+
+- Event driven I/O for streaming queries and results.
+- Standard interface for multiple database adapters.
+
 ## Usage
 
 Please see the [project documentation](https://socketry.github.io/db).

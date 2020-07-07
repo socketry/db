@@ -14,8 +14,8 @@ $ bundle add db
 
 `db` has several core concepts:
 
-- A {ruby DB::Client} which is configured to connect to a specific database using an adapter, and manages a connection pool.
-- A {ruby DB::Context} instance which is bound to a specific connection and allows you to execute queries and enumerate results.
+- A {ruby DB::Client} instance which is configured to connect to a specific database using an adapter, and manages a connection pool.
+- A {ruby DB::Context::Query} instance which is bound to a specific connection and allows you to execute queries and enumerate results.
 
 ## Connecting to Postgres
 
