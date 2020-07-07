@@ -20,10 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative '../query'
+
 module DB
 	module Context
 		# A connected context for sending queries and reading results.
-		class Query
+		class Session
 			# Iniitalize the query context attached to the given connection pool.
 			def initialize(pool, **options)
 				@pool = pool
@@ -42,6 +44,10 @@ module DB
 					
 					@connection = nil
 				end
+			end
+			
+			def < part
+				Query.new(self) < part
 			end
 			
 			# Send a query to the server.

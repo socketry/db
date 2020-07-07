@@ -25,15 +25,25 @@ RSpec.shared_examples_for DB::Client do |adapter|
 	
 	it "can execute a query" do
 		Sync do
-			query = subject.call(<<~SQL * 2)
+			session = subject.call(<<~SQL * 2)
 				SELECT 42 AS LIFE;
 			SQL
 			
-			query.results do |result|
+			session.results do |result|
 				result.each do |row|
 					expect(row).to be == [42]
 				end
 			end
+		end
+	end
+	
+	it "can generate a query with literal values" do
+		Sync do
+			session = subject.call
+			
+			result = (session < "SELECT " <= 42 < " AS LIFE").call
+			
+			expect(result.to_a).to be == [[42]]
 		end
 	end
 	
@@ -66,15 +76,10 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		
 		it 'can insert rows with timestamps' do
 			Sync do
-				subject.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')").close
+				session = subject.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')")
 				
-				query = subject.call('SELECT * FROM events')
-				
-				rows = nil
-				
-				query.results do |result|
-					rows = result.to_a
-				end
+				result = session.call('SELECT * FROM events')
+				rows = result.to_a
 				
 				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), "Hello World"]]
 			end
@@ -82,15 +87,10 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		
 		it 'can insert null fields' do
 			Sync do
-				subject.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)").close
+				session = subject.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)")
 				
-				query = subject.call('SELECT * FROM events')
-				
-				rows = nil
-				
-				query.results do |result|
-					rows = result.to_a
-				end
+				result = session.call('SELECT * FROM events')
+				rows = result.to_a
 				
 				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), nil]]
 			end

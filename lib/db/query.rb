@@ -20,32 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'session'
-
 module DB
-	module Context
-		class Transaction < Session
-			# Commit the transaction and return the connection to the connection pool.
-			def commit
-				self.call("COMMIT")
-				self.close
+	class Query
+		def initialize(session)
+			@session = session
+			@connection = session.connection
+			@buffer = String.new
+		end
+		
+		def <= literal
+			@connection.append_literal(literal, @buffer)
+			
+			return self
+		end
+		
+		def < part
+			case part
+			when Symbol
+				@connection.append_identifier(part, @buffer)
+			when Array
+				part.each_with_index do |identifier, index|
+					@buffer << '.' unless index.zero?
+					
+					@connection.append_identifier(identifier, @buffer)
+				end
+			else
+				@buffer << part
 			end
 			
-			# Abort the transaction and return the connection to the connection pool.
-			def abort
-				self.call("ROLLBACK")
-				self.close
-			end
-			
-			# Mark a savepoint in the transaction.
-			def savepoint(name)
-				self.call("SAVEPOINT #{name}")
-			end
-			
-			# Return back to a previously registered savepoint.
-			def rollback(name)
-				self.call("ROLLBACK #{name}")
-			end
+			return self
+		end
+		
+		def send
+			@session.send_query(@buffer)
+		end
+		
+		def call
+			@session.call(@buffer)
 		end
 	end
-end 
+end

@@ -24,7 +24,7 @@ require 'async/io'
 require 'async/io/stream'
 require 'async/pool/controller'
 
-require_relative 'context/query'
+require_relative 'context/session'
 require_relative 'context/transaction'
 
 module DB
@@ -50,21 +50,21 @@ module DB
 		# Acquires a connection and sends the specified statement if given.
 		# @parameters statement [String | Nil] An optional statement to send.
 		# @yields {|session| ...} A connected session if a block is given. Implicitly closed.
-		# 	@parameter session [Context::Query]
-		# @returns [Context::Query] A connected session if no block is given.
+		# 	@parameter session [Context::Session]
+		# @returns [Context::Session] A connected session if no block is given.
 		def call(statement = nil, **options)
-			query = Context::Query.new(@pool, **options)
+			session = Context::Session.new(@pool, **options)
 			
 			if statement
-				query.send_query(statement)
+				session.send_query(statement)
 			end
 			
-			return query unless block_given?
+			return session unless block_given?
 			
 			begin
-				yield query
+				yield session
 			ensure
-				query.close
+				session.close
 			end
 		end
 		
