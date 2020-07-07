@@ -48,13 +48,18 @@
 require 'db/client'
 require 'db/postgres'
 
+# Create the client and connection pool:
 client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
 
+# Create an event loop:
 Sync do
+	# Connect to the database:
 	session = client.call
 	
+	# Execute the query and get a result set:
 	result = session.call(&quot;SHOW SERVER_VERSION&quot;)
 	
+	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# =&gt; [[&quot;12.3&quot;]]
 end
@@ -68,13 +73,18 @@ end
 require 'db/client'
 require 'db/mariadb'
 
+# Create the client and connection pool:
 client = DB::Client.new(DB::MariaDB::Adapter.new(database: 'test'))
 
+# Create an event loop:
 Sync do
+	# Connect to the database:
 	session = client.call
 	
+	# Execute the query and get a result set:
 	result = session.call(&quot;SELECT VERSION()&quot;)
 	
+	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# =&gt; [[&quot;10.4.13-MariaDB&quot;]]
 end
