@@ -38,7 +38,7 @@ client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
 # Create an event loop:
 Sync do
 	# Connect to the database:
-	session = client.call
+	session = client.session
 	
 	# Execute the query and get a result set:
 	result = session.call("SHOW SERVER_VERSION")
@@ -46,6 +46,10 @@ Sync do
 	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# => [["12.3"]]
+	
+ensure
+	# Return the connection to the client connection pool:
+	session.close
 end
 ~~~
 
@@ -70,7 +74,7 @@ client = DB::Client.new(DB::MariaDB::Adapter.new(database: 'test'))
 # Create an event loop:
 Sync do
 	# Connect to the database:
-	session = client.call
+	session = client.session
 	
 	# Execute the query and get a result set:
 	result = session.call("SELECT VERSION()")
@@ -78,5 +82,13 @@ Sync do
 	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# => [["10.4.13-MariaDB"]]
+	
+ensure
+	# Return the connection to the client connection pool:
+	session.close
 end
 ~~~
+
+## Streaming Results
+
+Some database adaptors may stream results row by row. This reduces memory usage and latency. Because of that, you may only call {ruby #each} or {ruby #to_a} on a query result once.

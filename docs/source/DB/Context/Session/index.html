@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-			<title>DB::Context::Query</title>
+			<title>DB::Context::Session</title>
 		
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -26,7 +26,7 @@
 		<nav> › <a class="link" href="../../../../index.html">Project</a> › <a class="link" href="../../../index.html">Source</a></nav>
 		
 		
-	<h1><code class="language-ruby">DB::Context::Query</code></h1>
+	<h1><code class="language-ruby">DB::Context::Session</code></h1>
 	
 	<main>
 		<p>A connected context for sending queries and reading results.</p>
@@ -34,15 +34,15 @@
 		
 		<h2>Definitions</h2>
 		
-		<h3 id="DB::Context::Query#initialize"><code class="language-ruby">def initialize(pool, **options)</code></h3><p>Iniitalize the query context attached to the given connection pool.</p>
+		<h3 id="DB::Context::Session#initialize"><code class="language-ruby">def initialize(pool, **options)</code></h3><p>Iniitalize the query context attached to the given connection pool.</p>
 <details>
 							<summary><h4>Implementation</h4></summary>
 							<pre><code class="language-ruby">def initialize(pool, **options)
 	@pool = pool
 	@connection = pool.acquire
 end</code></pre>
-						</details><h3 id="DB::Context::Query#connection"><code class="language-ruby">attr :connection</code></h3><p>The underlying connection.</p>
-<h3 id="DB::Context::Query#close"><code class="language-ruby">def close</code></h3><p>Flush the connection and then return it to the connection pool.</p>
+						</details><h3 id="DB::Context::Session#connection"><code class="language-ruby">attr :connection</code></h3><p>The underlying connection.</p>
+<h3 id="DB::Context::Session#close"><code class="language-ruby">def close</code></h3><p>Flush the connection and then return it to the connection pool.</p>
 <details>
 							<summary><h4>Implementation</h4></summary>
 							<pre><code class="language-ruby">def close
@@ -54,7 +54,7 @@ end</code></pre>
 		@connection = nil
 	end
 end</code></pre>
-						</details><h3 id="DB::Context::Query#send_query"><code class="language-ruby">def send_query(statement, **options)</code></h3><p>Send a query to the server.</p>
+						</details><h3 id="DB::Context::Session#send_query"><code class="language-ruby">def send_query(statement, **options)</code></h3><p>Send a query to the server.</p>
 <details open>
 	<summary><h4>Signature</h4></summary>
 	<dl><dt>
@@ -64,9 +64,10 @@ end</code></pre>
 <details>
 							<summary><h4>Implementation</h4></summary>
 							<pre><code class="language-ruby">def send_query(statement, **options)
+	# Console.logger.info(self, statement)
 	@connection.send_query(statement, **options)
 end</code></pre>
-						</details><h3 id="DB::Context::Query#next_result"><code class="language-ruby">def next_result</code></h3><p>Read the next result. Sending a query usually generates 1 or more results.</p>
+						</details><h3 id="DB::Context::Session#next_result"><code class="language-ruby">def next_result</code></h3><p>Read the next result. Sending a query usually generates 1 or more results.</p>
 <details open>
 	<summary><h4>Signature</h4></summary>
 	<dl><dt>
@@ -78,7 +79,7 @@ end</code></pre>
 							<pre><code class="language-ruby">def next_result
 	@connection.next_result
 end</code></pre>
-						</details><h3 id="DB::Context::Query#call"><code class="language-ruby">def call(statement, **options)</code></h3><p>Send a query to the server and read the next result.</p>
+						</details><h3 id="DB::Context::Session#call"><code class="language-ruby">def call(statement, **options)</code></h3><p>Send a query to the server and read the next result.</p>
 <details open>
 	<summary><h4>Signature</h4></summary>
 	<dl><dt>
@@ -88,11 +89,12 @@ end</code></pre>
 <details>
 							<summary><h4>Implementation</h4></summary>
 							<pre><code class="language-ruby">def call(statement, **options)
+	# Console.logger.info(self, statement)
 	@connection.send_query(statement, **options)
 	
 	return @connection.next_result
 end</code></pre>
-						</details><h3 id="DB::Context::Query#results"><code class="language-ruby">def results</code></h3><p>Enumerate all results.</p>
+						</details><h3 id="DB::Context::Session#results"><code class="language-ruby">def results</code></h3><p>Enumerate all results.</p>
 <details open>
 	<summary><h4>Signature</h4></summary>
 	<dl><dt>
@@ -110,7 +112,7 @@ end</code></pre>
 	
 	return nil
 end</code></pre>
-						</details><h3 id="DB::Context::Query#flush"><code class="language-ruby">def flush</code></h3><p>Flush all outstanding results.</p>
+						</details><h3 id="DB::Context::Session#flush"><code class="language-ruby">def flush</code></h3><p>Flush all outstanding results.</p>
 <details>
 							<summary><h4>Implementation</h4></summary>
 							<pre><code class="language-ruby">def flush

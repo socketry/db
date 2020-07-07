@@ -37,7 +37,7 @@
 <p><code>db</code> has several core concepts:</p>
 <ul>
 <li>A <a href="../../source/DB/Client/index.html" title="DB::Client"><code class="language-ruby">class DB::Client</code></a> instance which is configured to connect to a specific database using an adapter, and manages a connection pool.</li>
-<li>A <a href="../../source/DB/Context/Query/index.html" title="DB::Context::Query"><code class="language-ruby">class DB::Context::Query</code></a> instance which is bound to a specific connection and allows you to execute queries and enumerate results.</li>
+<li>A <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> instance which is bound to a specific connection and allows you to execute queries and enumerate results.</li>
 </ul>
 <h2 id="connecting-to-postgres">Connecting to Postgres</h2>
 <p>Add the Postgres adaptor to your project:</p>
@@ -54,7 +54,7 @@ client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
 # Create an event loop:
 Sync do
 	# Connect to the database:
-	session = client.call
+	session = client.session
 	
 	# Execute the query and get a result set:
 	result = session.call(&quot;SHOW SERVER_VERSION&quot;)
@@ -62,6 +62,10 @@ Sync do
 	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# =&gt; [[&quot;12.3&quot;]]
+	
+ensure
+	# Return the connection to the client connection pool:
+	session.close
 end
 </code></pre>
 <h2 id="connection-to-mariadb/mysql">Connection to MariaDB/MySQL</h2>
@@ -79,7 +83,7 @@ client = DB::Client.new(DB::MariaDB::Adapter.new(database: 'test'))
 # Create an event loop:
 Sync do
 	# Connect to the database:
-	session = client.call
+	session = client.session
 	
 	# Execute the query and get a result set:
 	result = session.call(&quot;SELECT VERSION()&quot;)
@@ -87,8 +91,14 @@ Sync do
 	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# =&gt; [[&quot;10.4.13-MariaDB&quot;]]
+	
+ensure
+	# Return the connection to the client connection pool:
+	session.close
 end
 </code></pre>
+<h2 id="streaming-results">Streaming Results</h2>
+<p>Some database adaptors may stream results row by row. This reduces memory usage and latency. Because of that, you may only call <code class="language-ruby">#each</code> or <code class="language-ruby">#to_a</code> on a query result once.</p>
 </main>
 
 		

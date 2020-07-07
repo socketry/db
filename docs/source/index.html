@@ -38,61 +38,7 @@
 						
 						
 						<ul class="index"><li>
-						<a href="DB/Context/Query/index.html"><code class="language-ruby">class Query</code></a>
-						
-							<p>A connected context for sending queries and reading results.</p>
-
-						
-						<ul class="index"><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23initialize"><code class="language-ruby">def initialize(pool, **options)</code></a>
-						
-							<p>Iniitalize the query context attached to the given connection pool.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23connection"><code class="language-ruby">attr :connection</code></a>
-						
-							<p>The underlying connection.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23close"><code class="language-ruby">def close</code></a>
-						
-							<p>Flush the connection and then return it to the connection pool.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23send_query"><code class="language-ruby">def send_query(statement, **options)</code></a>
-						
-							<p>Send a query to the server.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23next_result"><code class="language-ruby">def next_result</code></a>
-						
-							<p>Read the next result. Sending a query usually generates 1 or more results.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23call"><code class="language-ruby">def call(statement, **options)</code></a>
-						
-							<p>Send a query to the server and read the next result.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23results"><code class="language-ruby">def results</code></a>
-						
-							<p>Enumerate all results.</p>
-
-						
-											</li><li>
-						<a href="DB/Context/Query/index.html#DB%3A%3AContext%3A%3AQuery%23flush"><code class="language-ruby">def flush</code></a>
-						
-							<p>Flush all outstanding results.</p>
-
-						
-											</li></ul>					</li><li>
-						<a href="DB/Context/Transaction/index.html"><code class="language-ruby">class Transaction &lt; Query</code></a>
+						<a href="DB/Context/Transaction/index.html"><code class="language-ruby">class Transaction &lt; Session</code></a>
 						
 						
 						<ul class="index"><li>
@@ -119,7 +65,121 @@
 							<p>Return back to a previously registered savepoint.</p>
 
 						
+											</li></ul>					</li><li>
+						<a href="DB/Context/Session/index.html"><code class="language-ruby">class Session</code></a>
+						
+							<p>A connected context for sending queries and reading results.</p>
+
+						
+						<ul class="index"><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23initialize"><code class="language-ruby">def initialize(pool, **options)</code></a>
+						
+							<p>Iniitalize the query context attached to the given connection pool.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23connection"><code class="language-ruby">attr :connection</code></a>
+						
+							<p>The underlying connection.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23close"><code class="language-ruby">def close</code></a>
+						
+							<p>Flush the connection and then return it to the connection pool.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23send_query"><code class="language-ruby">def send_query(statement, **options)</code></a>
+						
+							<p>Send a query to the server.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23next_result"><code class="language-ruby">def next_result</code></a>
+						
+							<p>Read the next result. Sending a query usually generates 1 or more results.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23call"><code class="language-ruby">def call(statement, **options)</code></a>
+						
+							<p>Send a query to the server and read the next result.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23results"><code class="language-ruby">def results</code></a>
+						
+							<p>Enumerate all results.</p>
+
+						
+											</li><li>
+						<a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23flush"><code class="language-ruby">def flush</code></a>
+						
+							<p>Flush all outstanding results.</p>
+
+						
 											</li></ul>					</li></ul>					</li><li>
+						<a href="DB/Identifier/index.html"><code class="language-ruby">class Identifier &lt; Array</code></a>
+						
+							<p>Represents one or more identifiers for databases, tables or columns.</p>
+
+						
+						<ul class="index"><li>
+						<a href="DB/Identifier/index.html#DB%3A%3AIdentifier.%5B%5D"><code class="language-ruby">def self.[](*names)</code></a>
+						
+							<p>Construct an identifier from an array of names.</p>
+
+						
+											</li></ul>					</li><li>
+						<a href="DB/Query/index.html"><code class="language-ruby">class Query</code></a>
+						
+							<p>A mutable query builder.</p>
+
+						
+						<ul class="index"><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23initialize"><code class="language-ruby">def initialize(session)</code></a>
+						
+							<p>Create a new query builder attached to the specified session.</p>
+
+						
+											</li><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23clause"><code class="language-ruby">def clause(value)</code></a>
+						
+							<p>Append a raw textual clause to the query buffer.</p>
+
+						
+											</li><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23literal"><code class="language-ruby">def literal(value)</code></a>
+						
+							<p>Append a literal value to the query buffer.</p>
+
+						
+											</li><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23identifier"><code class="language-ruby">def identifier(value)</code></a>
+						
+							<p>Append an identifier value to the query buffer.</p>
+
+						
+											</li><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23interpolate"><code class="language-ruby">def interpolate(fragment, **parameters)</code></a>
+						
+							<p>Interpolate a query fragment with the specified parameters.</p>
+
+						
+											</li><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23send"><code class="language-ruby">def send</code></a>
+						
+							<p>Send the query to the remote server to be executed. See <a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23send_query" title="Context::Session#send_query"><code class="language-ruby">DB::Context::Session#send_query</code></a> for more details.</p>
+
+						
+											</li><li>
+						<a href="DB/Query/index.html#DB%3A%3AQuery%23call"><code class="language-ruby">def call</code></a>
+						
+							<p>Send the query to the remote server to be executed. See <a href="DB/Context/Session/index.html#DB%3A%3AContext%3A%3ASession%23call" title="Context::Session#call"><code class="language-ruby">DB::Context::Session#call</code></a> for more details.</p>
+
+						
+											</li></ul>					</li><li>
 						<a href="DB/Adapters/index.html"><code class="language-ruby">module Adapters</code></a>
 						
 							<p>A global map of registered adapters.</p>
@@ -162,7 +222,7 @@
 
 						
 											</li><li>
-						<a href="DB/Client/index.html#DB%3A%3AClient%23call"><code class="language-ruby">def call(statement = nil, **options)</code></a>
+						<a href="DB/Client/index.html#DB%3A%3AClient%23session"><code class="language-ruby">def session(statement = nil, **options)</code></a>
 						
 							<p>Acquires a connection and sends the specified statement if given.</p>
 
