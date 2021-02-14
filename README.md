@@ -6,8 +6,8 @@ Provides event-driven asynchronous drivers for various database adaptors, includ
 
 ## Features
 
-- Event driven I/O for streaming queries and results.
-- Standard interface for multiple database adapters.
+  - Event driven I/O for streaming queries and results.
+  - Standard interface for multiple database adapters.
 
 ## Usage
 
