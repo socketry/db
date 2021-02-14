@@ -33,7 +33,7 @@ RSpec.describe DB::Client do
 	it "should be fast to insert data" do
 		Benchmark.ips do |x|
 			DB::Adapters.each do |name, klass|
-				adapter = klass.new(database: 'test')
+				adapter = klass.new(**CREDENTIALS)
 				client = DB::Client.new(adapter)
 				
 				Sync do
@@ -56,7 +56,7 @@ RSpec.describe DB::Client do
 			end
 			
 			x.report('mysql2') do |repeats|
-				client = Mysql2::Client.new(database: 'test')
+				client = Mysql2::Client.new(**CREDENTIALS)
 				client.query('TRUNCATE benchmark')
 				
 				repeats.times do |index|
@@ -65,7 +65,10 @@ RSpec.describe DB::Client do
 			end
 			
 			x.report('pg') do |repeats|
-				client = PG.connect(dbname: 'test')
+				client = PG.connect(
+					**CREDENTIALS.transform_keys{|key| key == :database ? :dbname : key}
+				)
+				
 				client.exec('TRUNCATE benchmark')
 				
 				repeats.times do |index|
@@ -90,7 +93,7 @@ RSpec.describe DB::Client do
 		
 		Benchmark.ips do |x|
 			DB::Adapters.each do |name, klass|
-				adapter = klass.new(database: 'test')
+				adapter = klass.new(**CREDENTIALS)
 				client = DB::Client.new(adapter)
 				
 				Sync do
@@ -115,7 +118,7 @@ RSpec.describe DB::Client do
 			end
 			
 			x.report('mysql2') do |repeats|
-				client = Mysql2::Client.new(database: 'test')
+				client = Mysql2::Client.new(**CREDENTIALS)
 				
 				repeats.times do |index|
 					result = client.query('SELECT * FROM benchmark')
@@ -124,7 +127,9 @@ RSpec.describe DB::Client do
 			end
 			
 			x.report('pg') do |repeats|
-				client = PG.connect(dbname: 'test')
+				client = PG.connect(
+					**CREDENTIALS.transform_keys{|key| key == :database ? :dbname : key}
+				)
 				
 				repeats.times do |index|
 					result = client.exec('SELECT * FROM benchmark')
