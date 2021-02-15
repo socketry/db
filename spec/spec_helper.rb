@@ -26,7 +26,7 @@ require 'bundler/setup'
 Bundler.require(:adapters)
 
 CREDENTIALS = {
-	user: 'test',
+	username: 'test',
 	password: 'test',
 	database: 'test',
 	host: '127.0.0.1'
