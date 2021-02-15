@@ -65,9 +65,7 @@ RSpec.describe DB::Client do
 			end
 			
 			x.report('pg') do |repeats|
-				client = PG.connect(
-					**CREDENTIALS.transform_keys{|key| key == :database ? :dbname : key}
-				)
+				client = PG.connect(**PG_CREDENTIALS)
 				
 				client.exec('TRUNCATE benchmark')
 				
@@ -126,10 +124,9 @@ RSpec.describe DB::Client do
 				end
 			end
 			
+			
 			x.report('pg') do |repeats|
-				client = PG.connect(
-					**CREDENTIALS.transform_keys{|key| key == :database ? :dbname : key}
-				)
+				client = PG.connect(**PG_CREDENTIALS)
 				
 				repeats.times do |index|
 					result = client.exec('SELECT * FROM benchmark')

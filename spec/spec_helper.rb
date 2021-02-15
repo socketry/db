@@ -32,6 +32,11 @@ CREDENTIALS = {
 	host: '127.0.0.1'
 }
 
+# Used for PG.connect:
+PG_CREDENTIALS = CREDENTIALS.dup
+PG_CREDENTIALS[:user] = PG_CREDENTIALS.delete(:username)
+PG_CREDENTIALS[:dbname] = PG_CREDENTIALS.delete(:database)
+
 RSpec.configure do |config|
 	# Enable flags like --only-failures and --next-failure
 	config.example_status_persistence_file_path = ".rspec_status"
