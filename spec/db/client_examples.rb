@@ -80,7 +80,7 @@ RSpec.shared_examples_for DB::Client do |adapter|
 				
 				transaction.call("DROP TABLE IF EXISTS events")
 				
-				transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.id_column}, created_at TIMESTAMP NOT NULL, description TEXT NULL)")
+				transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.key_column}, created_at TIMESTAMP NOT NULL, description TEXT NULL)")
 				
 				transaction.commit
 			end

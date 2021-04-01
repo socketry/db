@@ -40,7 +40,7 @@ RSpec.describe DB::Client do
 					session = client.session
 					
 					session.call("DROP TABLE IF EXISTS benchmark")
-					session.call("CREATE TABLE benchmark (#{session.connection.id_column}, i INTEGER)")
+					session.call("CREATE TABLE benchmark (#{session.connection.key_column}, i INTEGER)")
 				end
 				
 				x.report("db-#{name}") do |repeats|
@@ -98,7 +98,7 @@ RSpec.describe DB::Client do
 					session = client.session
 					
 					session.call("DROP TABLE IF EXISTS benchmark")
-					session.call("CREATE TABLE benchmark (#{session.connection.id_column}, i INTEGER)")
+					session.call("CREATE TABLE benchmark (#{session.connection.key_column}, i INTEGER)")
 					
 					session.call(insert_query)
 				end

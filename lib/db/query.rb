@@ -98,6 +98,12 @@ module DB
 			return self
 		end
 		
+		def key_column(*arguments, **options)
+			@buffer << @connection.key_column(*arguments, **options)
+			
+			return self
+		end
+		
 		# Send the query to the remote server to be executed. See {Context::Session#send_query} for more details.
 		def send
 			@session.send_query(@buffer)
