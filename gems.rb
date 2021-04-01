@@ -11,8 +11,8 @@ group :maintenance, optional: true do
 end
 
 group :adapters do
-	gem "db-postgres"#, path: "../db-postgres"
-	gem "db-mariadb"#, path: "../db-mariadb"
+	gem "db-postgres", "~> 0.4.0"
+	gem "db-mariadb", "~> 0.7.0"
 end
 
 group :benchmark do
