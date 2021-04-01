@@ -52,7 +52,7 @@ module DB
 			
 			def query(fragment, **parameters)
 				if parameters.empty?
-					Query.new(self).clause(fragment)
+					Query.new(self, fragment)
 				else
 					Query.new(self).interpolate(fragment, **parameters)
 				end

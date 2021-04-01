@@ -36,10 +36,10 @@ module DB
 	class Query
 		# Create a new query builder attached to the specified session.
 		# @parameter session [Context::Session] the connected session which is used for escaping arguments.
-		def initialize(session)
+		def initialize(session, buffer = String.new)
 			@session = session
 			@connection = session.connection
-			@buffer = String.new
+			@buffer = +buffer
 		end
 		
 		# Append a raw textual clause to the query buffer.
