@@ -30,6 +30,21 @@ module DB
 		def self.[](*names)
 			self.new(names)
 		end
+		
+		def self.coerce(name_or_identifier)
+			case name_or_identifier
+			when Identifier
+				name_or_identifier
+			when Symbol
+				self.new(name_or_identifier)
+			else
+				self.new(name_or_identifier.to_sym)
+			end
+		end
+		
+		def append_to(query)
+			query.identifier(self)
+		end
 	end
 	
 	# A mutable query builder.
