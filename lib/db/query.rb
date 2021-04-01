@@ -114,5 +114,13 @@ module DB
 		def call
 			@session.call(@buffer)
 		end
+		
+		def to_s
+			@buffer
+		end
+		
+		def inspect
+			"\#<#{self.class} #{@buffer.inspect}>"
+		end
 	end
 end
