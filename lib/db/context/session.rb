@@ -50,7 +50,7 @@ module DB
 				Query.new(self).clause(*arguments)
 			end
 			
-			def query(fragment, **parameters)
+			def query(fragment = String.new, **parameters)
 				if parameters.empty?
 					Query.new(self, fragment)
 				else
