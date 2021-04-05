@@ -23,22 +23,16 @@
 module DB
 	# Represents one or more identifiers for databases, tables or columns.
 	class Identifier < Array
-		# Construct an identifier from an array of names.
-		# e.g. `DB::Identifier[:mytable, :mycolumn]`
-		#
-		# @parameter names [Array] The array of names.
-		def self.[](*names)
-			self.new(names)
-		end
-		
 		def self.coerce(name_or_identifier)
 			case name_or_identifier
 			when Identifier
 				name_or_identifier
-			when Symbol
+			when Array
 				self.new(name_or_identifier)
+			when Symbol
+				self[name_or_identifier]
 			else
-				self.new(name_or_identifier.to_sym)
+				self[name_or_identifier.to_sym]
 			end
 		end
 		
