@@ -32,6 +32,10 @@ module DB
 				@connection = nil
 			end
 			
+			def connection?
+				@connection != nil
+			end
+			
 			# Lazy initialize underlying connection.
 			def connection
 				@connection ||= @pool.acquire
@@ -45,16 +49,16 @@ module DB
 				end
 			end
 			
-			def clause(fragment = String.new)
-				Query.new(self, fragment)
-			end
-			
 			def query(fragment = String.new, **parameters)
 				if parameters.empty?
 					Query.new(self, fragment)
 				else
 					Query.new(self).interpolate(fragment, **parameters)
 				end
+			end
+			
+			def clause(fragment = String.new)
+				Query.new(self, fragment)
 			end
 			
 			# Send a query to the server.
