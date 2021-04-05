@@ -55,7 +55,7 @@ module DB
 		# @parameter value [String] A raw SQL string, e.g. `WHERE x > 10`.
 		# @returns [Query] The mutable query itself.
 		def clause(value)
-			@buffer << ' ' unless @buffer.end_with?(' ')
+			@buffer << ' ' unless @buffer.end_with?(' ') || @buffer.empty?
 			
 			@buffer << value
 			
