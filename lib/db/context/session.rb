@@ -46,8 +46,8 @@ module DB
 				end
 			end
 			
-			def clause(*arguments)
-				Query.new(self).clause(*arguments)
+			def clause(fragment = String.new)
+				Query.new(self, fragment)
 			end
 			
 			def query(fragment = String.new, **parameters)
