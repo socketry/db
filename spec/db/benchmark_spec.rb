@@ -108,8 +108,10 @@ RSpec.describe DB::Client do
 						session = client.session
 						
 						repeats.times do |index|
-							result = session.call('SELECT * FROM benchmark')
-							expect(result.to_a).to have_attributes(size: row_count)
+							session.call('SELECT * FROM benchmark') do |connection|
+								result = connection.next_result
+								expect(result.to_a).to have_attributes(size: row_count)
+							end
 						end
 					end
 				end
