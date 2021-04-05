@@ -24,6 +24,7 @@ require 'async/io'
 require 'async/io/stream'
 require 'async/pool/controller'
 
+require_relative 'context/generic'
 require_relative 'context/session'
 require_relative 'context/transaction'
 
@@ -47,17 +48,26 @@ module DB
 			@pool.close
 		end
 		
+		# Acquire a generic context which will acquire a connection on demand.
+		def context(**options)
+			context = Context::Generic.new(@pool, **options)
+			
+			return context unless block_given?
+			
+			begin
+				yield context
+			ensure
+				context.close
+			end
+		end
+		
 		# Acquires a connection and sends the specified statement if given.
 		# @parameters statement [String | Nil] An optional statement to send.
 		# @yields {|session| ...} A connected session if a block is given. Implicitly closed.
 		# 	@parameter session [Context::Session]
 		# @returns [Context::Session] A connected session if no block is given.
-		def session(statement = nil, **options)
+		def session(**options)
 			session = Context::Session.new(@pool, **options)
-			
-			if statement
-				session.send_query(statement)
-			end
 			
 			return session unless block_given?
 			
@@ -73,12 +83,10 @@ module DB
 		# @yields {|session| ...} A connected session if a block is given. Implicitly commits, or aborts the connnection if an exception is raised.
 		# 	@parameter session [Context::Transaction]
 		# @returns [Context::Transaction] A connected and started transaction if no block is given.
-		def transaction(statement = "BEGIN", **options)
+		def transaction(**options)
 			transaction = Context::Transaction.new(@pool, **options)
 			
-			if statement
-				transaction.call("BEGIN")
-			end
+			transaction.call("BEGIN")
 			
 			return transaction unless block_given?
 			
@@ -86,8 +94,8 @@ module DB
 				yield transaction
 				
 				transaction.commit
-			ensure
-				transaction.abort if $!
+			rescue
+				transaction.abort
 			end
 		end
 		

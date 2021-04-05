@@ -43,11 +43,11 @@ module DB
 	
 	# A mutable query builder.
 	class Query
-		# Create a new query builder attached to the specified session.
-		# @parameter session [Context::Session] the connected session which is used for escaping arguments.
-		def initialize(session, buffer = String.new)
-			@session = session
-			@connection = session.connection
+		# Create a new query builder attached to the specified context.
+		# @parameter context [Context::Generic] the context which is used for escaping arguments.
+		def initialize(context, buffer = String.new)
+			@context = context
+			@connection = context.connection
 			@buffer = +buffer
 		end
 		
@@ -113,15 +113,10 @@ module DB
 			return self
 		end
 		
-		# Send the query to the remote server to be executed. See {Context::Session#send_query} for more details.
-		def send
-			@session.send_query(@buffer)
-		end
-		
 		# Send the query to the remote server to be executed. See {Context::Session#call} for more details.
 		# @returns [Enumerable] The resulting records.
 		def call
-			@session.call(@buffer)
+			@context.call(@buffer)
 		end
 		
 		def to_s

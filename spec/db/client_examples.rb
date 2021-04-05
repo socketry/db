@@ -23,15 +23,18 @@
 RSpec.shared_examples_for DB::Client do |adapter|
 	subject{DB::Client.new(adapter)}
 	
-	it "can execute a query" do
+	it "can execute multiple queries" do
 		Sync do
-			session = subject.session(<<~SQL * 2)
+			context = subject.context
+			
+			query = <<~SQL * 2
 				SELECT 42 AS LIFE;
 			SQL
 			
-			session.results do |result|
-				result.each do |row|
-					expect(row).to be == [42]
+			context.call(query) do |connection|
+				2.times do
+					result = connection.next_result
+					expect(result.to_a).to be == [[42]]
 				end
 			end
 		end
@@ -41,9 +44,10 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		Sync do
 			session = subject.session
 			
-			result = session.clause("SELECT").literal(42).clause("AS").identifier(:LIFE).call
-			
-			expect(result.to_a).to be == [[42]]
+			session.clause("SELECT").literal(42).clause("AS").identifier(:LIFE).call do |connection|
+				result = connection.next_result
+				expect(result.to_a).to be == [[42]]
+			end
 		end
 	end
 	
@@ -51,11 +55,10 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		Sync do
 			session = subject.session
 			
-			result = session.query(<<~SQL, value: 42, column: :LIFE).call
-				SELECT %{value} AS %{column}
-			SQL
-			
-			expect(result.to_a).to be == [[42]]
+			session.query("SELECT %{value} AS %{column}", value: 42, column: :LIFE).call do |connection|
+				result = connection.next_result
+				expect(result.to_a).to be == [[42]]
+			end
 		end
 	end
 	
@@ -63,11 +66,10 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		Sync do
 			transaction = subject.transaction
 			
-			result = transaction.call(<<~SQL)
-				SELECT 42 AS LIFE;
-			SQL
-			
-			expect(result.to_a).to be == [[42]]
+			transaction.call("SELECT 42 AS LIFE") do |connection|
+				result = connection.next_result
+				expect(result.to_a).to be == [[42]]
+			end
 			
 			transaction.commit
 		end
@@ -88,10 +90,13 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		
 		it 'can insert rows with timestamps' do
 			Sync do
-				session = subject.session("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')")
+				session = subject.session
 				
-				result = session.call('SELECT * FROM events')
-				rows = result.to_a
+				session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')")
+				
+				rows = session.call('SELECT * FROM events') do |connection|
+					connection.next_result.to_a
+				end
 				
 				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), "Hello World"]]
 			end
@@ -99,10 +104,13 @@ RSpec.shared_examples_for DB::Client do |adapter|
 		
 		it 'can insert null fields' do
 			Sync do
-				session = subject.session("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)")
+				session = subject.session
 				
-				result = session.call('SELECT * FROM events')
-				rows = result.to_a
+				session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)")
+				
+				rows = session.call('SELECT * FROM events') do |connection|
+					connection.next_result.to_a
+				end
 				
 				expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), nil]]
 			end
