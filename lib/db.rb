@@ -22,3 +22,4 @@
 
 require_relative 'db/version'
 require_relative 'db/adapters'
+require_relative 'db/client'
