@@ -96,6 +96,7 @@ module DB
 				transaction.commit
 			rescue
 				transaction.abort
+				raise
 			end
 		end
 		
