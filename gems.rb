@@ -11,12 +11,12 @@ group :maintenance, optional: true do
 end
 
 group :adapters do
-	gem "db-postgres", "~> 0.4.0"
-	gem "db-mariadb", "~> 0.7.0"
+	gem "db-postgres"
+	gem "db-mariadb"
 end
 
 group :benchmark do
-	gem "benchmark-ips"
+	gem "benchmark-ips", "~> 2.8.0"
 	gem "mysql2"
 	gem "pg"
 end
