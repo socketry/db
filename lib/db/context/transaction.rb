@@ -31,6 +31,12 @@ module DB
 				self.close
 			end
 			
+			def commit?
+				unless self.closed?
+					self.commit
+				end
+			end
+			
 			# Abort the transaction and return the connection to the connection pool.
 			def abort
 				self.call("ROLLBACK")

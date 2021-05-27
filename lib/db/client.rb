@@ -93,10 +93,11 @@ module DB
 			begin
 				yield transaction
 				
-				transaction.commit
 			rescue
 				transaction.abort
 				raise
+			ensure
+				transaction.commit?
 			end
 		end
 		

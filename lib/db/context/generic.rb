@@ -49,6 +49,10 @@ module DB
 				end
 			end
 			
+			def closed?
+				@connection.nil?
+			end
+			
 			def query(fragment = String.new, **parameters)
 				if parameters.empty?
 					Query.new(self, fragment)
