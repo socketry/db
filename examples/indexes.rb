@@ -17,6 +17,9 @@ def create_schema(session)
 			.identifier(:low).clause("INT NOT NULL,")
 			.identifier(:high).clause("INT NOT NULL")
 		.clause(")").call
+	
+	session.clause("SET default_statistics_target=10000;").call
+	session.clause("CREATE STATISTICS low_high_statistics (dependencies) ON low, high FROM things;").call
 end
 
 # Depending on the structure of the index, the query can be handled in different ways.
@@ -80,6 +83,8 @@ def create_data(session)
 end
 
 def create_index(session, low_high: true, high_low: true)
+	session.clause("SET default_statistics_target=10000;").call
+	
 	if low_high
 		session.clause("CREATE INDEX IF NOT EXISTS")
 			.identifier(:low_high)
@@ -128,15 +133,14 @@ Sync do
 			result = session.query("SELECT low, high FROM things WHERE low = #{i} AND high = 5001").call.to_a
 		end
 		
+		analysis = session.query("EXPLAIN ANALYZE SELECT low, high FROM things WHERE low = 25 AND high = 500000").call.to_a
+		Console.logger.info(session, *analysis.flatten)
+		
 		Console.logger.measure("query") do
 			10_000.times do |i|
 				result = session.query("SELECT low, high FROM things WHERE low = #{i % 50} AND high = #{(i * 12351237) % 1_000_000}").call.to_a
 				# pp result
 			end
 		end
-		
-			# Console.logger.info(session, "#{i} => #{result}")
-			# analysis = session.query("EXPLAIN ANALYZE SELECT low, high FROM things WHERE low = 1 AND high = 5001").call.to_a
-			# Console.logger.info(session, *analysis.flatten)
 	end
 end
