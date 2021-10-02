@@ -37,19 +37,20 @@ RSpec.describe DB::Client do
 				client = DB::Client.new(adapter)
 				
 				Sync do
-					session = client.session
-					
-					session.call("DROP TABLE IF EXISTS benchmark")
-					session.call("CREATE TABLE benchmark (#{session.connection.key_column}, i INTEGER)")
+					client.session do |session|
+						session.call("DROP TABLE IF EXISTS benchmark")
+						session.call("CREATE TABLE benchmark (#{session.connection.key_column}, i INTEGER)")
+					end
 				end
 				
 				x.report("db-#{name}") do |repeats|
 					Sync do
-						session = client.session
-						session.call('TRUNCATE benchmark')
-						
-						repeats.times do |index|
-							session.call("INSERT INTO benchmark (i) VALUES (#{index})")
+						client.session do |session|
+							session.call('TRUNCATE benchmark')
+							
+							repeats.times do |index|
+								session.call("INSERT INTO benchmark (i) VALUES (#{index})")
+							end
 						end
 					end
 				end
@@ -95,22 +96,22 @@ RSpec.describe DB::Client do
 				client = DB::Client.new(adapter)
 				
 				Sync do
-					session = client.session
-					
-					session.call("DROP TABLE IF EXISTS benchmark")
-					session.call("CREATE TABLE benchmark (#{session.connection.key_column}, i INTEGER)")
-					
-					session.call(insert_query)
+					client.session do |session|
+						session.call("DROP TABLE IF EXISTS benchmark")
+						session.call("CREATE TABLE benchmark (#{session.connection.key_column}, i INTEGER)")
+						
+						session.call(insert_query)
+					end
 				end
 				
 				x.report("db-#{name}") do |repeats|
 					Sync do
-						session = client.session
-						
-						repeats.times do |index|
-							session.call('SELECT * FROM benchmark') do |connection|
-								result = connection.next_result
-								expect(result.to_a).to have_attributes(size: row_count)
+						client.session do |session|
+							repeats.times do |index|
+								session.call('SELECT * FROM benchmark') do |connection|
+									result = connection.next_result
+									expect(result.to_a).to have_attributes(size: row_count)
+								end
 							end
 						end
 					end
@@ -125,7 +126,6 @@ RSpec.describe DB::Client do
 					expect(result.to_a).to have_attributes(size: row_count)
 				end
 			end
-			
 			
 			x.report('pg') do |repeats|
 				client = PG.connect(**PG_CREDENTIALS)
