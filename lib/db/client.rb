@@ -24,7 +24,7 @@ require 'async/io'
 require 'async/io/stream'
 require 'async/pool/controller'
 
-require_relative 'context/generic'
+require_relative 'context/transient'
 require_relative 'context/session'
 require_relative 'context/transaction'
 
@@ -50,7 +50,7 @@ module DB
 		
 		# Acquire a generic context which will acquire a connection on demand.
 		def context(**options)
-			context = Context::Generic.new(@pool, **options)
+			context = Context::Transient.new(@pool, **options)
 			
 			return context unless block_given?
 			

@@ -20,57 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../query'
+require_relative 'session'
 
 module DB
 	module Context
 		# A connected context for sending queries and reading results.
-		class Generic
-			# Iniitalize the query context attached to the given connection pool.
-			def initialize(pool, **options)
-				@pool = pool
-				@connection = nil
-			end
-			
-			def connection?
-				@connection != nil
-			end
-			
-			# Lazy initialize underlying connection.
-			def connection
-				@connection ||= @pool.acquire
-			end
-			
-			# Flush the connection and then return it to the connection pool.
-			def close
-				if @connection
-					@pool.release(@connection)
-					@connection = nil
-				end
-			end
-			
-			def closed?
-				@connection.nil?
-			end
-			
-			def query(fragment = String.new, **parameters)
-				if parameters.empty?
-					Query.new(self, fragment)
-				else
-					Query.new(self).interpolate(fragment, **parameters)
-				end
-			end
-			
-			def clause(fragment = String.new)
-				Query.new(self, fragment)
-			end
-			
-			# Send a query to the server.
-			# @parameter statement [String] The SQL query to send.
-			def call(statement, **options)
-				connection.send_query(statement, **options)
-				
-				yield connection if block_given?
+		class Transient < Session
+			def call(statement, **options, &block)
+				super
 			ensure
 				self.close
 			end
