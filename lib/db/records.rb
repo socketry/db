@@ -23,12 +23,10 @@
 module DB
 	# A buffer of records.
 	class Records
-		EMPTY = self.new.freeze
-		
 		def self.wrap(result)
 			# We want to avoid extra memory allocations when there are no columns:
-			if result.field_count == 0
-				return EMPTY
+			if result.field_count == 0 || result.row_count == 0
+				return nil
 			end
 			
 			return self.new(result.field_names, result.to_a)
