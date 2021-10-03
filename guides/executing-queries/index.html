@@ -33,7 +33,7 @@
 	
 	<p>This guide explains how to escape and execute queries. In order to execute a query, you need a connection. Database connections are stateful, and this state is encapsulated by a context.</p>
 <section id="contexts"><h2>Contexts</h2>
-<p>Contexts represent a stateful connection to a remote server. The most generic kind, <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> provides methods for sending queries and processing results. <a href="http://localhost:36109/source/DB/Context/Transaction/index" title="DB::Context::Transaction"><code class="language-ruby">class DB::Context::Transaction</code></a> extends this implementation and adds methods for database transactions.</p>
+<p>Contexts represent a stateful connection to a remote server. The most generic kind, <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> provides methods for sending queries and processing results. <a href="http://localhost:42185/source/DB/Context/Transaction/index" title="DB::Context::Transaction"><code class="language-ruby">class DB::Context::Transaction</code></a> extends this implementation and adds methods for database transactions.</p>
 </section><section id="sessions"><h3>Sessions</h3>
 <p>A <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> represents a connection to the database server and can be used to send queries to the server and read rows of results.</p>
 <pre><code class="language-ruby">require 'async'
