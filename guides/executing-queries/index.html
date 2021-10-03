@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+			<title>Executing Queries</title>
+		
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		
+		<link rel="icon" type="image/png" href="../../_static/icon.png"/>
+		<link rel="stylesheet" href="../../_static/site.css" type="text/css" media="screen"/>
+		
+		<script src="../../_components/jquery/jquery.min.js"></script>
+		<script src="../../_components/jquery-syntax/jquery.syntax.min.js"></script>
+		
+		<script src="../../_static/links.js"></script>
+		
+		<script type="text/javascript">
+		//<![CDATA[
+			jQuery(function($) {
+				$.syntax();
+			});
+		//]]>
+		</script>
+	</head>
+
+	<body>
+		<header> › <a class="link" href="../../index.html">Project</a> › <a class="link" href="../index.html">Guides</a></header>
+		
+		<main>
+			
+	<h1>Executing Queries</h1>
+	
+	<p>This guide explains how to escape and execute queries. In order to execute a query, you need a connection. Database connections are stateful, and this state is encapsulated by a context.</p>
+<section id="contexts"><h2>Contexts</h2>
+<p>Contexts represent a stateful connection to a remote server. The most generic kind, <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> provides methods for sending queries and processing results. <a href="http://localhost:36109/source/DB/Context/Transaction/index" title="DB::Context::Transaction"><code class="language-ruby">class DB::Context::Transaction</code></a> extends this implementation and adds methods for database transactions.</p>
+</section><section id="sessions"><h3>Sessions</h3>
+<p>A <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> represents a connection to the database server and can be used to send queries to the server and read rows of results.</p>
+<pre><code class="language-ruby">require 'async'
+require 'db/client'
+require 'db/postgres'
+
+client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+
+Sync do
+	session = client.session
+	
+	# Build a query, injecting the literal 42 and the identifier LIFE into the statement:
+	result = session
+		.clause(&quot;SELECT&quot;).literal(42)
+		.clause(&quot;AS&quot;).identifier(:LIFE).call
+	
+	pp result.to_a
+	# =&gt; [[42]]
+end
+</code></pre>
+</section><section id="transactions"><h3>Transactions</h3>
+<p>Transactions ensure consistency when selecting and inserting data. While the exact semantics are server specific, transactions normally ensure that all statements execute at a consistent point in time and that if any problem occurs during the transaction, the entire transaction is aborted.</p>
+<pre><code class="language-ruby">require 'async'
+require 'db/client'
+require 'db/postgres'
+
+client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+
+Sync do
+	session = client.transaction
+	
+	# Use the explicit DSL for generating queries:
+	session.clause(&quot;CREATE TABLE&quot;)
+		.identifier(:users)
+		.clause(&quot;(&quot;)
+			.identifier(:id).clause(&quot;BIGSERIAL PRIMARY KEY,&quot;)
+			.identifier(:name).clause(&quot;VARCHAR NOT NULL&quot;)
+		.clause(&quot;)&quot;).call
+	
+	# Use interpolation for generating queries:
+	session.query(&lt;&lt;~SQL, table: :users, column: :name, value: &quot;ioquatix&quot;).call
+		INSERT INTO %{table} (%{column}) VALUES (%{value})
+	SQL
+	
+	result = session.clause(&quot;SELECT * FROM&quot;).identifier(:users).call
+	
+	pp result.to_a
+	
+	session.abort
+	
+ensure
+	session.close
+end
+</code></pre>
+<p>Because the session was aborted, the table and data are never committed:</p>
+<pre><code class="language-ruby">require 'async'
+require 'db/client'
+require 'db/postgres'
+
+client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+
+Sync do
+	session = client.session
+	
+	result = session.clause(&quot;SELECT * FROM&quot;).identifier(:users).call
+	# =&gt; DB::Postgres::Error: Could not get next result: ERROR:  relation &quot;users&quot; does not exist
+	
+	pp result.to_a
+	
+ensure
+	session.close
+end
+</code></pre>
+</section><section id="closing-sessions"><h3>Closing Sessions</h3>
+<p>It is important that you close a session or commit/abort a transaction (implicit close). Closing a session returns it to the connection pool. If you don't do this, you will leak connections. Both <a href="../../source/DB/Client/index.html#DB%3A%3AClient%23session" title="DB::Client#session"><code class="language-ruby">DB::Client#session</code></a> and <a href="../../source/DB/Client/index.html#DB%3A%3AClient%23transaction" title="DB::Client#transaction"><code class="language-ruby">DB::Client#transaction</code></a> can accept blocks and will implicitly close/commit/abort as appropriate.</p>
+</section><section id="query-builder"><h2>Query Builder</h2>
+<p>A <a href="../../source/DB/Query/index.html" title="DB::Query"><code class="language-ruby">class DB::Query</code></a> builder is provided to help construct queries and avoid SQL injection attacks. This query builder is bound to a <a href="../../source/DB/Context/Session/index.html" title="DB::Context::Session"><code class="language-ruby">class DB::Context::Session</code></a> instance and provides convenient methods for constructing a query efficiently.</p>
+</section><section id="low-level-methods"><h3>Low Level Methods</h3>
+<p>There are several low level methods for constructing queries.</p>
+<ul>
+<li><a href="../../source/DB/Query/index.html#DB%3A%3AQuery%23clause" title="DB::Query#clause"><code class="language-ruby">DB::Query#clause</code></a> appends an unescaped fragment of SQL text.</li>
+<li><a href="../../source/DB/Query/index.html#DB%3A%3AQuery%23literal" title="DB::Query#literal"><code class="language-ruby">DB::Query#literal</code></a> appends an escaped literal value (e.g. <code class="language-ruby">String</code>, <code class="language-ruby">Integer</code>, <code class="language-ruby">true</code>, <code class="language-ruby">nil</code>, etc).</li>
+<li><a href="../../source/DB/Query/index.html#DB%3A%3AQuery%23identifier" title="DB::Query#identifier"><code class="language-ruby">DB::Query#identifier</code></a> appends an escaped identifier (<code class="language-ruby">Symbol</code>, <code class="language-ruby">Array</code>, <a href="../../source/DB/Identifier/index.html" title="DB::Identifier"><code class="language-ruby">class DB::Identifier</code></a>).</li>
+</ul>
+<pre><code class="language-ruby">require 'async'
+require 'db/client'
+require 'db/postgres'
+
+client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+
+Sync do
+	session = client.session
+	
+	# Build a query, injecting the literal 42 and the identifier LIFE into the statement:
+	result = session
+		.clause(&quot;SELECT&quot;).literal(42)
+		.clause(&quot;AS&quot;).identifier(:LIFE)
+		.call
+	
+	pp result.to_a
+	# =&gt; [[42]]
+end
+</code></pre>
+</section><section id="interpolation-method"><h3>Interpolation Method</h3>
+<p>You can also use string interpolation to safely construct queries.</p>
+<ul>
+<li><a href="../../source/DB/Query/index.html#DB%3A%3AQuery%23interpolate" title="DB::Query#interpolate"><code class="language-ruby">DB::Query#interpolate</code></a> appends an interpolated query string with escaped parameters.</li>
+</ul>
+<pre><code class="language-ruby">require 'async'
+require 'db/client'
+require 'db/postgres'
+
+client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+
+Sync do
+	session = client.session
+	
+	# Build a query, injecting the literal 42 and the identifier LIFE into the statement:
+	result = session.query(&lt;&lt;~SQL, value: 42, column: :LIFE).call
+		SELECT %{value} AS %{column}
+	SQL
+	
+	pp result.to_a
+	# =&gt; [[42]]
+end
+</code></pre>
+<p>Named parameters are escaped and substituted into the given fragment.</p>
+</section>
+				
+			<footer>Documentation generated by <a href="https://github.com/socketry/utopia-project">Utopia::Project</a>.</footer>
+		</main>
+	</body>
+</html>
