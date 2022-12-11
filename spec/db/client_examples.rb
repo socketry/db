@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative 'datatype_context'
+
 RSpec.shared_examples_for DB::Client do |adapter|
 	subject{DB::Client.new(adapter)}
 	
@@ -116,4 +118,6 @@ RSpec.shared_examples_for DB::Client do |adapter|
 			end
 		end
 	end
+	
+	it_behaves_like "database that supports Time", adapter
 end
