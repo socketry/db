@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require_relative "lib/db/version"
 
@@ -14,14 +15,15 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/db"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.metadata = {
+		"documentation_uri" => "https://socketry.github.io/db/",
+		"funding_uri" => "https://github.com/sponsors/ioquatix",
+		"source_code_uri" => "https://github.com/socketry/db.git",
+	}
 	
-	spec.required_ruby_version = ">= 2.5"
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.add_dependency "async-io"
+	spec.required_ruby_version = ">= 3.1"
+	
 	spec.add_dependency "async-pool"
-	
-	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "covered"
-	spec.add_development_dependency "rspec", "~> 3.0"
 end

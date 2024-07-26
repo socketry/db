@@ -3,6 +3,10 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-module DB
-	VERSION = "0.10.3"
+require 'db'
+
+describe DB do
+	it "has a version number" do
+		expect(DB::VERSION).to be =~ /\d+\.\d+\.\d+/
+	end
 end

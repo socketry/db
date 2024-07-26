@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+require 'active_support'
+ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
+
 require 'active_record'
 ActiveRecord::Base.establish_connection(adapter: "postgresql", database: "test", pool: 64)
 
@@ -53,6 +58,8 @@ class Compare
 			@db.session do |session|
 				session.query("SELECT pg_sleep(1)").call
 			end
+			
+			puts @db.instance_variable_get(:@pool).to_s
 		end
 		
 		OK

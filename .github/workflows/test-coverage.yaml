@@ -1,0 +1,92 @@
+name: Test Coverage
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+env:
+  CONSOLE_OUTPUT: XTerm
+  COVERAGE: PartialSummary
+
+jobs:
+  test:
+    name: ${{matrix.ruby}} on ${{matrix.os}}
+    runs-on: ${{matrix.os}}-latest
+    
+    strategy:
+      matrix:
+        os:
+          - ubuntu
+        
+        ruby:
+          - "3.3"
+    
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+      mariadb:
+        image: mariadb
+        ports:
+          - 3306:3306
+        env:
+          MARIADB_USER: test
+          MARIADB_PASSWORD: test
+          MARIADB_DATABASE: test
+          MARIADB_ROOT_PASSWORD: test
+        options: >-
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{matrix.ruby}}
+        bundler-cache: true
+    
+    - name: Installing dependencies (ubuntu)
+      if: matrix.os == 'ubuntu'
+      run: |
+        sudo systemctl stop mysql
+        sudo apt-get install libmariadb-dev postgresql postgresql-contrib
+    
+    - name: Run tests
+      timeout-minutes: 5
+      run: bundle exec bake test
+    
+    - uses: actions/upload-artifact@v3
+      with:
+        name: coverage-${{matrix.os}}-${{matrix.ruby}}
+        path: .covered.db
+  
+  validate:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.3"
+        bundler-cache: true
+    
+    - uses: actions/download-artifact@v3
+    
+    - name: Validate coverage
+      timeout-minutes: 5
+      run: bundle exec bake covered:validate --paths */.covered.db \;
