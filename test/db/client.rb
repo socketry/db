@@ -12,6 +12,16 @@ AClient = Sus::Shared("a client") do |adapter|
 	
 	let(:client) {DB::Client.new(adapter)}
 	
+	it "can select version" do
+		context = client.context
+		
+		result = context.call("SELECT VERSION()")
+		expect(result).to be_a(DB::Records)
+		
+		row = result.rows.first
+		expect(row[0]).to be_a(String)
+	end
+	
 	it "can execute multiple queries" do
 		context = client.context
 		
