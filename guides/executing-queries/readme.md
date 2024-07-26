@@ -1,6 +1,8 @@
 # Executing Queries
 
-This guide explains how to escape and execute queries. In order to execute a query, you need a connection. Database connections are stateful, and this state is encapsulated by a context.
+This guide explains how to escape and execute queries.
+
+In order to execute a query, you need a connection. Database connections are stateful, and this state is encapsulated by a context.
 
 ## Contexts
 

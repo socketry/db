@@ -41,12 +41,11 @@ Sync do
 	session = client.session
 	
 	# Execute the query and get a result set:
-	result = session.call("SHOW SERVER_VERSION")
+	result = session.call("SELECT VERSION()")
 	
 	# Convert the result set to an array and print it out:
 	pp result.to_a
-	# => [["12.3"]]
-	
+	# => [["PostgreSQL 16.3 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.1.1 20240522, 64-bit"]]
 ensure
 	# Return the connection to the client connection pool:
 	session.close
@@ -82,13 +81,8 @@ Sync do
 	# Convert the result set to an array and print it out:
 	pp result.to_a
 	# => [["10.4.13-MariaDB"]]
-	
 ensure
 	# Return the connection to the client connection pool:
 	session.close
 end
 ~~~
-
-## Streaming Results
-
-Some database adaptors may stream results row by row. This reduces memory usage and latency. Because of that, you may only call {ruby #each} or {ruby #to_a} on a query result once.

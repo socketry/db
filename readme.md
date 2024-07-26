@@ -11,7 +11,13 @@ Provides event-driven asynchronous drivers for various database adaptors, includ
 
 ## Usage
 
-Please see the [project documentation](https://socketry.github.io/db).
+Please see the [project documentation](https://socketry.github.io/db/) for more details.
+
+  - [Getting Started](https://socketry.github.io/db/guides/getting-started/index) - This guide explains how to use `db` for database queries.
+
+  - [Executing Queries](https://socketry.github.io/db/guides/executing-queries/index) - This guide explains how to escape and execute queries.
+
+  - [Example Queries](https://socketry.github.io/db/guides/example-queries/index) - This guide shows how to perform basic queries with the `db` library.
 
 ## Contributing
 

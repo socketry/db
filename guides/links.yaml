@@ -2,3 +2,5 @@ getting-started:
   order: 1
 executing-queries:
   order: 2
+example-queries:
+  order: 3
