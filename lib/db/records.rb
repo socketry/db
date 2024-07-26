@@ -8,7 +8,7 @@ module DB
 	class Records
 		def self.wrap(result)
 			# We want to avoid extra memory allocations when there are no columns:
-			if result.field_count == 0 || result.row_count == 0
+			if result.field_count == 0
 				return nil
 			end
 			
