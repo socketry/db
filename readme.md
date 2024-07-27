@@ -17,7 +17,7 @@ Please see the [project documentation](https://socketry.github.io/db/) for more 
 
   - [Executing Queries](https://socketry.github.io/db/guides/executing-queries/index) - This guide explains how to escape and execute queries.
 
-  - [Example Queries](https://socketry.github.io/db/guides/example-queries/index) - This guide shows how to perform basic queries with the `db` library.
+  - [Example Queries](https://socketry.github.io/db/guides/example-queries/index) - This guide shows a variety of example queries using the DB gem.
 
   - [Data Types](https://socketry.github.io/db/guides/datatypes/index) - This guide explains about SQL data types, and how they are used by the DB gem.
 

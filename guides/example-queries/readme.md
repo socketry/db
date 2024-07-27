@@ -1,6 +1,6 @@
 # Example Queries
 
-This guide shows how to perform basic queries with the `db` library.
+This guide shows a variety of example queries using the DB gem.
 
 ## Setup
 
@@ -11,7 +11,7 @@ require 'db/postgres'
 
 client = DB::Client.new(DB::Postgres::Adapter.new(
 	database: 'test',
-	host:	 '172.17.0.3',
+	host:	    '172.17.0.3',
 	password: 'test',
 	username: 'postgres',
 ))
