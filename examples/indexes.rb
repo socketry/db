@@ -50,7 +50,7 @@ def create_data(session)
 	million = (0...1_000_000).to_a
 	
 	rows = {
-		 5 => million.dup,
+		5  => million.dup,
 		10 => million.dup,
 		15 => million.dup,
 		20 => million.dup,
