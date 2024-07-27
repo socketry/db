@@ -4,5 +4,5 @@
 # Copyright, 2020-2024, by Samuel Williams.
 
 module DB
-	VERSION = "0.10.3"
+	VERSION = "0.11.0"
 end
