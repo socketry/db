@@ -3,8 +3,6 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'async/io'
-require 'async/io/stream'
 require 'async/pool/controller'
 
 require_relative 'context/transient'
