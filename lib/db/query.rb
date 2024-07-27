@@ -99,6 +99,7 @@ module DB
 		# Send the query to the remote server to be executed. See {Context::Session#call} for more details.
 		# @returns [Enumerable] The resulting records.
 		def call(&block)
+			# Console.debug(self, "Executing query...", buffer: @buffer)
 			@context.call(@buffer, &block)
 		end
 		

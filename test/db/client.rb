@@ -3,14 +3,10 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'db/client'
-require 'db/adapters'
-require 'sus/fixtures/async'
+require 'db/client_context'
 
 AClient = Sus::Shared("a client") do |adapter|
-	include Sus::Fixtures::Async::ReactorContext
-	
-	let(:client) {DB::Client.new(adapter)}
+	include_context DB::ClientContext, adapter
 	
 	it "can select version" do
 		context = client.context
