@@ -4,3 +4,5 @@ executing-queries:
   order: 2
 example-queries:
   order: 3
+datatypes:
+  order: 4

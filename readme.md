@@ -19,6 +19,8 @@ Please see the [project documentation](https://socketry.github.io/db/) for more 
 
   - [Example Queries](https://socketry.github.io/db/guides/example-queries/index) - This guide shows how to perform basic queries with the `db` library.
 
+  - [Data Types](https://socketry.github.io/db/guides/datatypes/index) - This guide explains about SQL data types, and how they are used by the DB gem.
+
 ## Contributing
 
 We welcome contributions to this project.
