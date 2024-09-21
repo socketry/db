@@ -16,12 +16,11 @@ module DB
 				@connection = nil
 			end
 			
-			def connection?
-				@connection != nil
-			end
+			attr :pool
+			attr :connection
 			
-			# Lazy initialize underlying connection.
-			def connection
+			# Pin a connection to the current session.
+			def connect!
 				@connection ||= @pool.acquire
 			end
 			
@@ -37,29 +36,47 @@ module DB
 				@connection.nil?
 			end
 			
-			def query(fragment = String.new, **parameters)
-				if parameters.empty?
-					Query.new(self, fragment)
+			def with_connection(&block)
+				if @connection
+					yield @connection
 				else
-					Query.new(self).interpolate(fragment, **parameters)
+					@pool.acquire do |connection|
+						@connection = connection
+						
+						yield connection
+					ensure
+						@connection = nil
+					end
 				end
-			end
-			
-			def clause(fragment = String.new)
-				Query.new(self, fragment)
 			end
 			
 			# Send a query to the server.
 			# @parameter statement [String] The SQL query to send.
 			def call(statement, **options)
-				connection = self.connection
-				
-				connection.send_query(statement, **options)
-				
-				if block_given?
-					yield connection
-				elsif result = connection.next_result
-					return Records.wrap(result)
+				self.with_connection do |connection|
+					connection.send_query(statement, **options)
+					
+					if block_given?
+						yield connection
+					elsif result = connection.next_result
+						return Records.wrap(result)
+					end
+				end
+			end
+			
+			def query(fragment = String.new, **parameters)
+				with_connection do
+					if parameters.empty?
+						Query.new(self, fragment)
+					else
+						Query.new(self).interpolate(fragment, **parameters)
+					end
+				end
+			end
+			
+			def clause(fragment = String.new)
+				with_connection do
+					Query.new(self, fragment)
 				end
 			end
 		end

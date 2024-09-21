@@ -11,110 +11,88 @@ describe DB::Client do
 			include_context DB::ClientContext, klass.new(**CREDENTIALS)
 			
 			it "can select version" do
-				context = client.context
-				
-				result = context.call("SELECT VERSION()")
-				expect(result).to be_a(DB::Records)
-				
-				row = result.rows.first
-				expect(row[0]).to be_a(String)
-			ensure
-				context.close
+				client.session do |session|
+					result = session.call("SELECT VERSION()")
+					expect(result).to be_a(DB::Records)
+					
+					row = result.rows.first
+					expect(row[0]).to be_a(String)
+				end
 			end
 			
 			it "can execute multiple queries" do
-				context = client.context
-				
-				query = <<~SQL * 2
-					SELECT 42 AS LIFE;
-				SQL
-				
-				context.call(query) do |connection|
-					2.times do
+				client.session do |session|
+					query = <<~SQL * 2
+						SELECT 42 AS LIFE;
+					SQL
+					
+					session.call(query) do |connection|
+						2.times do
+							result = connection.next_result
+							expect(result.to_a).to be == [[42]]
+						end
+					end
+				end
+			end
+			
+			it "can generate a query with literal values" do
+				client.session do |session|
+					session.clause("SELECT").literal(42).clause("AS").identifier(:LIFE).call do |connection|
 						result = connection.next_result
 						expect(result.to_a).to be == [[42]]
 					end
 				end
-			ensure
-				context.close
-			end
-			
-			it "can generate a query with literal values" do
-				session = client.session
-				
-				session.clause("SELECT").literal(42).clause("AS").identifier(:LIFE).call do |connection|
-					result = connection.next_result
-					expect(result.to_a).to be == [[42]]
-				end
-			ensure
-				session.close
 			end
 			
 			it "can generate a query using interpolations" do
-				session = client.session
-				
-				session.query("SELECT %{value} AS %{column}", value: 42, column: :LIFE).call do |connection|
-					result = connection.next_result
-					expect(result.to_a).to be == [[42]]
+				client.session do |session|
+					session.query("SELECT %{value} AS %{column}", value: 42, column: :LIFE).call do |connection|
+						result = connection.next_result
+						expect(result.to_a).to be == [[42]]
+					end
 				end
-			ensure
-				session.close
 			end
 			
 			it "can execute a query in a transaction" do
-				transaction = client.transaction
-				
-				transaction.call("SELECT 42 AS LIFE") do |connection|
-					result = connection.next_result
-					expect(result.to_a).to be == [[42]]
+				client.transaction do |transaction|
+					transaction.call("SELECT 42 AS LIFE") do |connection|
+						result = connection.next_result
+						expect(result.to_a).to be == [[42]]
+					end
 				end
-				
-				transaction.commit
-			ensure
-				transaction.close
 			end
 			
 			with 'events table' do
-				def before
-					super
-					
-					transaction = client.transaction
-					
-					transaction.call("DROP TABLE IF EXISTS events")
-					
-					transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.key_column}, created_at TIMESTAMP NOT NULL, description TEXT NULL)")
-					
-					transaction.commit
-				ensure
-					transaction.close
+				before do
+					client.transaction do |transaction|
+						transaction.call("DROP TABLE IF EXISTS events")
+						
+						transaction.call("CREATE TABLE IF NOT EXISTS events (#{transaction.connection.key_column}, created_at TIMESTAMP NOT NULL, description TEXT NULL)")
+					end
 				end
 				
 				it 'can insert rows with timestamps' do
-					session = client.session
-					
-					session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')")
-					
-					rows = session.call('SELECT * FROM events') do |connection|
-						connection.next_result.to_a
+					client.session do |session|
+						session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')")
+						
+						rows = session.call('SELECT * FROM events') do |connection|
+							connection.next_result.to_a
+						end
+						
+						expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), "Hello World"]]
 					end
-					
-					expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), "Hello World"]]
-				ensure
-					session.close
 				end
 				
 				it 'can insert null fields' do
-					session = client.session
-					
-					session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)")
-					
-					rows = session.call('SELECT * FROM events') do |connection|
-						connection.next_result.to_a
+					client.session do |session|
+						session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)")
+						
+						rows = session.call('SELECT * FROM events') do |connection|
+							connection.next_result.to_a
+						end
+						
+						expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), nil]]
 					end
-					
-					expect(rows).to be == [[1, Time.parse("2020-05-04 03:02:01 UTC"), nil]]
-				ensure
-					session.close
 				end
 			end
 		end

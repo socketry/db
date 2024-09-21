@@ -5,7 +5,6 @@
 
 require 'async/pool/controller'
 
-require_relative 'context/transient'
 require_relative 'context/session'
 require_relative 'context/transaction'
 
@@ -29,19 +28,6 @@ module DB
 			@pool.close
 		end
 		
-		# Acquire a generic context which will acquire a connection on demand.
-		def context(**options)
-			context = Context::Transient.new(@pool, **options)
-			
-			return context unless block_given?
-			
-			begin
-				yield context
-			ensure
-				context.close
-			end
-		end
-		
 		# Acquires a connection and sends the specified statement if given.
 		# @parameters statement [String | Nil] An optional statement to send.
 		# @yields {|session| ...} A connected session if a block is given. Implicitly closed.
@@ -53,11 +39,15 @@ module DB
 			return session unless block_given?
 			
 			begin
+				session.connect!
+				
 				yield session
 			ensure
 				session.close
 			end
 		end
+		
+		alias context session
 		
 		# Acquires a connection and starts a transaction.
 		# @parameters statement [String | Nil] An optional statement to send. Defaults to `"BEGIN"`.
@@ -67,7 +57,7 @@ module DB
 		def transaction(**options)
 			transaction = Context::Transaction.new(@pool, **options)
 			
-			transaction.call("BEGIN")
+			transaction.begin
 			
 			return transaction unless block_given?
 			

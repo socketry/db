@@ -12,28 +12,25 @@ describe "datetime datatype" do
 			
 			it "can insert utc time" do
 				time = Time.utc(2020, 07, 02, 10, 11, 12)
-				session = client.session
-				
-				session.query("INSERT INTO %{table_name} (value) VALUES (%{value})", table_name: table_name, value: time).call
-				
-				row = session.query("SELECT * FROM %{table_name}", table_name: table_name).call.to_a.first
-				
-				expect(row.first).to be == time
-			ensure
-				session.close
+				client.session do |session|
+					session.query("INSERT INTO %{table_name} (value) VALUES (%{value})", table_name: table_name, value: time).call
+					
+					row = session.query("SELECT * FROM %{table_name}", table_name: table_name).call.to_a.first
+					
+					expect(row.first).to be == time
+				end
 			end
 			
 			it "can insert local time" do
 				time = Time.new(2020, 07, 02, 10, 11, 12, "+12:00")
-				session = client.session
 				
-				session.query("INSERT INTO %{table_name} (value) VALUES (%{value})", table_name: table_name, value: time).call
-				
-				row = session.query("SELECT * FROM %{table_name}", table_name: table_name).call.to_a.first
-				
-				expect(row.first).to be == time
-			ensure
-				session.close
+				client.session do |session|
+					session.query("INSERT INTO %{table_name} (value) VALUES (%{value})", table_name: table_name, value: time).call
+					
+					row = session.query("SELECT * FROM %{table_name}", table_name: table_name).call.to_a.first
+					
+					expect(row.first).to be == time
+				end
 			end
 		end
 	end

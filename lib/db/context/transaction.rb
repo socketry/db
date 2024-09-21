@@ -8,6 +8,12 @@ require_relative 'session'
 module DB
 	module Context
 		class Transaction < Session
+			# Begin a transaction.
+			def begin
+				self.connect!
+				self.call("BEGIN")
+			end
+			
 			# Commit the transaction and return the connection to the connection pool.
 			def commit
 				self.call("COMMIT")
