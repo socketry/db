@@ -3,10 +3,10 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'async/pool/controller'
+require "async/pool/controller"
 
-require_relative 'context/session'
-require_relative 'context/transaction'
+require_relative "context/session"
+require_relative "context/transaction"
 
 module DB
 	# Binds a connection pool to the specified adapter.

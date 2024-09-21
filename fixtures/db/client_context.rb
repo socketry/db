@@ -3,9 +3,9 @@
 # Released under the MIT License.
 # Copyright, 2024, by Samuel Williams.
 
-require 'db/client'
-require 'db/adapters'
-require 'sus/fixtures/async'
+require "db/client"
+require "db/adapters"
+require "sus/fixtures/async"
 
 module DB
 	ClientContext = Sus::Shared("client context") do |adapter|

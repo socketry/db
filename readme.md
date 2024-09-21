@@ -23,11 +23,11 @@ Please see the [project documentation](https://socketry.github.io/db/) for more 
 
 ## See Also
 
-- [db-postgres](https://github.com/socketry/db-postgres) - Postgres adapter for the DB gem.
-- [db-mariadb](https://github.com/socketry/db-mariadb) - MariaDB/MySQL adapter for the DB gem.
-- [db-model](https://github.com/socketry/db-model) - A simple object relational mapper (ORM) for the DB gem.
-- [db-migrate](https://github.com/socketry/db-migrate) - Database migration tooling for the DB gem.
-- [db-active_record](https://github.com/socketry/db-active_record) - An ActiveRecord adapter for the DB gem.
+  - [db-postgres](https://github.com/socketry/db-postgres) - Postgres adapter for the DB gem.
+  - [db-mariadb](https://github.com/socketry/db-mariadb) - MariaDB/MySQL adapter for the DB gem.
+  - [db-model](https://github.com/socketry/db-model) - A simple object relational mapper (ORM) for the DB gem.
+  - [db-migrate](https://github.com/socketry/db-migrate) - Database migration tooling for the DB gem.
+  - [db-active\_record](https://github.com/socketry/db-active_record) - An ActiveRecord adapter for the DB gem.
 
 ## Contributing
 

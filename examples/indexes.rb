@@ -4,12 +4,12 @@
 # Released under the MIT License.
 # Copyright, 2021-2024, by Samuel Williams.
 
-require 'async'
-require_relative '../lib/db/client'
-require 'db/postgres'
+require "async"
+require_relative "../lib/db/client"
+require "db/postgres"
 
 # Create the client and connection pool:
-client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+client = DB::Client.new(DB::Postgres::Adapter.new(database: "test"))
 
 def create_schema(session)
 	session.clause("DROP TABLE IF EXISTS").identifier(:things).call

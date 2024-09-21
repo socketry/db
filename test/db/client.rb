@@ -3,7 +3,7 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'db/client_context'
+require "db/client_context"
 
 describe DB::Client do
 	DB::Adapters.each do |name, klass|
@@ -62,7 +62,7 @@ describe DB::Client do
 				end
 			end
 			
-			with 'events table' do
+			with "events table" do
 				before do
 					client.transaction do |transaction|
 						transaction.call("DROP TABLE IF EXISTS events")
@@ -71,11 +71,11 @@ describe DB::Client do
 					end
 				end
 				
-				it 'can insert rows with timestamps' do
+				it "can insert rows with timestamps" do
 					client.session do |session|
 						session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', 'Hello World')")
 						
-						rows = session.call('SELECT * FROM events') do |connection|
+						rows = session.call("SELECT * FROM events") do |connection|
 							connection.next_result.to_a
 						end
 						
@@ -83,11 +83,11 @@ describe DB::Client do
 					end
 				end
 				
-				it 'can insert null fields' do
+				it "can insert null fields" do
 					client.session do |session|
 						session.call("INSERT INTO events (created_at, description) VALUES ('2020-05-04 03:02:01', NULL)")
 						
-						rows = session.call('SELECT * FROM events') do |connection|
+						rows = session.call("SELECT * FROM events") do |connection|
 							connection.next_result.to_a
 						end
 						

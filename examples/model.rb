@@ -40,7 +40,7 @@ module AppliationSchema
 	schema :todo => TodoSchema
 end
 
-client = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+client = DB::Client.new(DB::Postgres::Adapter.new(database: "test"))
 schema = ApplicationSchema.new(client)
 
 schema.login.call(username, password)

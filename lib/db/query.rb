@@ -38,7 +38,7 @@ module DB
 		# @parameter value [String] A raw SQL string, e.g. `WHERE x > 10`.
 		# @returns [Query] The mutable query itself.
 		def clause(value)
-			@buffer << ' ' unless @buffer.end_with?(' ') || @buffer.empty?
+			@buffer << " " unless @buffer.end_with?(" ") || @buffer.empty?
 			
 			@buffer << value
 			
@@ -50,7 +50,7 @@ module DB
 		# @parameter value [Object] Any kind of object, passed to the underlying database connection for conversion to a string representation.
 		# @returns [Query] The mutable query itself.
 		def literal(value)
-			@buffer << ' ' unless @buffer.end_with?(' ')
+			@buffer << " " unless @buffer.end_with?(" ")
 			
 			@connection.append_literal(value, @buffer)
 			
@@ -62,7 +62,7 @@ module DB
 		# @parameter value [String | Symbol | DB::Identifier] Passed to the underlying database connection for conversion to a string representation.
 		# @returns [Query] The mutable query itself.
 		def identifier(value)
-			@buffer << ' ' unless @buffer.end_with?(' ')
+			@buffer << " " unless @buffer.end_with?(" ")
 			
 			@connection.append_identifier(value, @buffer)
 			

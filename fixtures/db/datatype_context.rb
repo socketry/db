@@ -3,7 +3,7 @@
 # Released under the MIT License.
 # Copyright, 2024, by Samuel Williams.
 
-require_relative 'client_context'
+require_relative "client_context"
 
 module DB
 	DatatypeContext = Sus::Shared("datatype context") do |adapter, datatype|

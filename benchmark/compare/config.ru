@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'active_support'
+require "active_support"
 ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
 
-require 'active_record'
+require "active_record"
 ActiveRecord::Base.establish_connection(adapter: "postgresql", database: "test", pool: 64)
 
-require_relative '../../lib/db'
-require 'db/postgres'
+require_relative "../../lib/db"
+require "db/postgres"
 
 # TracePoint.new(:fiber_switch) do |trace_point|
 # 	$stderr.puts "************* fiber switch (pid=#{Process.pid}) *************"
@@ -18,10 +18,10 @@ require 'db/postgres'
 class Compare
 	def initialize(app)
 		@app = app
-		@db = DB::Client.new(DB::Postgres::Adapter.new(database: 'test'))
+		@db = DB::Client.new(DB::Postgres::Adapter.new(database: "test"))
 	end
 	
-	PATH_INFO = 'PATH_INFO'.freeze
+	PATH_INFO = "PATH_INFO".freeze
 	OK = [200, [], ["OK"]]
 	
 	def active_record_checkout(env)

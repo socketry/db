@@ -3,7 +3,7 @@
 # Released under the MIT License.
 # Copyright, 2024, by Samuel Williams.
 
-require 'db/datatype_context'
+require "db/datatype_context"
 
 describe "datetime datatype" do
 	DB::Adapters.each do |name, klass|

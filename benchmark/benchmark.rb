@@ -3,14 +3,14 @@
 # Released under the MIT License.
 # Copyright, 2020-2024, by Samuel Williams.
 
-require 'benchmark/ips'
-require 'async'
+require "benchmark/ips"
+require "async"
 
-require 'db/client'
-require 'db/adapters'
+require "db/client"
+require "db/adapters"
 
-require 'mysql2'
-require 'pg'
+require "mysql2"
+require "pg"
 
 describe DB::Client do
 	it "should be fast to insert data" do
@@ -29,7 +29,7 @@ describe DB::Client do
 				x.report("db-#{name}") do |repeats|
 					Sync do
 						client.session do |session|
-							session.call('TRUNCATE benchmark')
+							session.call("TRUNCATE benchmark")
 							
 							repeats.times do |index|
 								session.call("INSERT INTO benchmark (i) VALUES (#{index})")
@@ -39,19 +39,19 @@ describe DB::Client do
 				end
 			end
 			
-			x.report('mysql2') do |repeats|
+			x.report("mysql2") do |repeats|
 				client = Mysql2::Client.new(**CREDENTIALS)
-				client.query('TRUNCATE benchmark')
+				client.query("TRUNCATE benchmark")
 				
 				repeats.times do |index|
 					client.query("INSERT INTO benchmark (i) VALUES (#{index})")
 				end
 			end
 			
-			x.report('pg') do |repeats|
+			x.report("pg") do |repeats|
 				client = PG.connect(**PG_CREDENTIALS)
 				
-				client.exec('TRUNCATE benchmark')
+				client.exec("TRUNCATE benchmark")
 				
 				repeats.times do |index|
 					client.exec("INSERT INTO benchmark (i) VALUES (#{index})")
@@ -91,7 +91,7 @@ describe DB::Client do
 					Sync do
 						client.session do |session|
 							repeats.times do |index|
-								session.call('SELECT * FROM benchmark') do |connection|
+								session.call("SELECT * FROM benchmark") do |connection|
 									result = connection.next_result
 									expect(result.to_a).to have_attributes(size: row_count)
 								end
@@ -101,20 +101,20 @@ describe DB::Client do
 				end
 			end
 			
-			x.report('mysql2') do |repeats|
+			x.report("mysql2") do |repeats|
 				client = Mysql2::Client.new(**CREDENTIALS)
 				
 				repeats.times do |index|
-					result = client.query('SELECT * FROM benchmark')
+					result = client.query("SELECT * FROM benchmark")
 					expect(result.to_a).to have_attributes(size: row_count)
 				end
 			end
 			
-			x.report('pg') do |repeats|
+			x.report("pg") do |repeats|
 				client = PG.connect(**PG_CREDENTIALS)
 				
 				repeats.times do |index|
-					result = client.exec('SELECT * FROM benchmark')
+					result = client.exec("SELECT * FROM benchmark")
 					expect(result.to_a).to have_attributes(size: row_count)
 				end
 			end
