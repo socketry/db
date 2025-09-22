@@ -7,6 +7,7 @@ require_relative "../query"
 require_relative "../records"
 
 module DB
+	# Provides context for database operations including sessions and transactions.
 	module Context
 		# A connected context for sending queries and reading results.
 		class Session
@@ -32,10 +33,15 @@ module DB
 				end
 			end
 			
+			# Check if the session connection is closed.
+			# @returns [Boolean] True if the connection is closed (nil), false otherwise.
 			def closed?
 				@connection.nil?
 			end
 			
+			# Execute a block with a database connection, acquiring one if necessary.
+			# @yields {|connection| ...} The connection block.
+			# 	@parameter connection [Object] The database connection object.
 			def with_connection(&block)
 				if @connection
 					yield @connection
@@ -64,6 +70,10 @@ module DB
 				end
 			end
 			
+			# Create a new query builder with optional initial fragment and parameters.
+			# @parameter fragment [String] Initial SQL fragment for the query.
+			# @parameter parameters [Hash] Parameters for interpolation into the fragment.
+			# @returns [Query] A new query builder instance.
 			def query(fragment = String.new, **parameters)
 				with_connection do
 					if parameters.empty?
@@ -74,6 +84,9 @@ module DB
 				end
 			end
 			
+			# Create a new query builder with an initial clause fragment.
+			# @parameter fragment [String] Initial SQL clause fragment.
+			# @returns [Query] A new query builder instance.
 			def clause(fragment = String.new)
 				with_connection do
 					Query.new(self, fragment)

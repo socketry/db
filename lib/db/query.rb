@@ -6,6 +6,9 @@
 module DB
 	# Represents one or more identifiers for databases, tables or columns.
 	class Identifier < Array
+		# Convert various input types to an Identifier instance.
+		# @parameter name_or_identifier [Identifier, Array, Symbol, String] The value to convert.
+		# @returns [Identifier] An Identifier instance.
 		def self.coerce(name_or_identifier)
 			case name_or_identifier
 			when Identifier
@@ -19,6 +22,8 @@ module DB
 			end
 		end
 		
+		# Append this identifier to the provided query builder.
+		# @parameter query [Query] The query builder to append to.
 		def append_to(query)
 			query.identifier(self)
 		end
@@ -90,6 +95,10 @@ module DB
 			return self
 		end
 		
+		# Generate a key column expression based on the connection's requirements.
+		# @parameter arguments [Array] Arguments passed to the connection's key_column method.
+		# @parameter options [Hash] Options passed to the connection's key_column method.
+		# @returns [Query] The mutable query itself.
 		def key_column(*arguments, **options)
 			@buffer << @connection.key_column(*arguments, **options)
 			
@@ -103,10 +112,14 @@ module DB
 			@context.call(@buffer, &block)
 		end
 		
+		# Get the string representation of the query buffer.
+		# @returns [String] The accumulated query string.
 		def to_s
 			@buffer
 		end
 		
+		# Inspect the query instance showing the class and current buffer contents.
+		# @returns [String] A string representation for debugging.
 		def inspect
 			"\#<#{self.class} #{@buffer.inspect}>"
 		end

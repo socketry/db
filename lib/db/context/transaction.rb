@@ -7,6 +7,7 @@ require_relative "session"
 
 module DB
 	module Context
+		# A database transaction context that extends Session with transaction management capabilities.
 		class Transaction < Session
 			# Begin a transaction.
 			def begin
@@ -20,6 +21,8 @@ module DB
 				self.close
 			end
 			
+			# Commit the transaction if it's still open, otherwise do nothing.
+			# This is a safe version of commit that checks if the transaction is still active.
 			def commit?
 				unless self.closed?
 					self.commit
