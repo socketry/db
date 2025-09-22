@@ -1,0 +1,22 @@
+# Automatically generated context index for Utopia::Project guides.
+# Do not edit then files in this directory directly, instead edit the guides and then run `bake utopia:project:agent:context:update`.
+---
+description: A low level database access gem.
+metadata:
+  documentation_uri: https://socketry.github.io/db/
+  funding_uri: https://github.com/sponsors/ioquatix
+  source_code_uri: https://github.com/socketry/db.git
+files:
+- path: getting-started.md
+  title: Getting Started
+  description: This guide explains how to use `db` for database queries.
+- path: executing-queries.md
+  title: Executing Queries
+  description: This guide explains how to escape and execute queries.
+- path: example-queries.md
+  title: Example Queries
+  description: This guide shows a variety of example queries using the DB gem.
+- path: datatypes.md
+  title: Data Types
+  description: This guide explains about SQL data types, and how they are used by
+    the DB gem.

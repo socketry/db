@@ -23,7 +23,9 @@ Please see the [project documentation](https://socketry.github.io/db/) for more 
 
 ## Releases
 
-There are no documented releases.
+Please see the [project releases](https://socketry.github.io/db/releases/index) for all releases.
+
+### v0.13.0
 
 ## See Also
 
