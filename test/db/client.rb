@@ -95,6 +95,20 @@ describe DB::Client do
 					end
 				end
 			end
+			
+			with "#transaction" do
+				it "aborts on exception" do
+					expect do
+						client.transaction do |transaction|
+							expect(transaction).to receive(:abort)
+							
+							transaction.call("SELECT 42 AS LIFE")
+							
+							raise "Something went wrong!"
+						end
+					end.to raise_exception(RuntimeError, message: be == "Something went wrong!")
+				end
+			end
 		end
 	end
 end

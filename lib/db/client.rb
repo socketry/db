@@ -25,6 +25,10 @@ module DB
 		
 		# Close all open connections in the connection pool.
 		def close
+			@pool.wait_until_free do
+				Console.warn(self) {"Waiting for #{@adapter} pool to drain: #{@pool}"}
+			end
+			
 			@pool.close
 		end
 		
