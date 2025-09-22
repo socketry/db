@@ -21,6 +21,10 @@ Please see the [project documentation](https://socketry.github.io/db/) for more 
 
   - [Data Types](https://socketry.github.io/db/guides/datatypes/index) - This guide explains about SQL data types, and how they are used by the DB gem.
 
+## Releases
+
+There are no documented releases.
+
 ## See Also
 
   - [db-postgres](https://github.com/socketry/db-postgres) - Postgres adapter for the DB gem.
