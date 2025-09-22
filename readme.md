@@ -25,7 +25,13 @@ Please see the [project documentation](https://socketry.github.io/db/) for more 
 
 Please see the [project releases](https://socketry.github.io/db/releases/index) for all releases.
 
+### v0.14.0
+
+  - Introduce `DB::Features` for feature detection.
+
 ### v0.13.0
+
+  - Add agent context.
 
 ## See Also
 
