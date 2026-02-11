@@ -7,6 +7,9 @@ module DB
 	# Standardized feature detection for database adapters.
 	# All features default to false, and adapters can enable specific capabilities.
 	class Features
+		# Initialize the Features instance with a hash of feature flags.
+		#
+		# @parameter features [Hash] A hash where keys are feature symbols and values are booleans indicating whether the feature is enabled.
 		def initialize(**features)
 			@features = features
 		end
