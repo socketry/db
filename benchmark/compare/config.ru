@@ -80,4 +80,4 @@ end
 
 use Compare
 
-run lambda {|env| [404, {}, ["Not Found"]]}
+run lambda{|env| [404, {}, ["Not Found"]]}

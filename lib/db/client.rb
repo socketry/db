@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2020-2024, by Samuel Williams.
+# Copyright, 2020-2026, by Samuel Williams.
 
 require "async/pool/controller"
 
@@ -26,7 +26,7 @@ module DB
 		# Close all open connections in the connection pool.
 		def close
 			@pool.wait_until_free do
-				Console.warn(self) {"Waiting for #{@adapter} pool to drain: #{@pool}"}
+				Console.warn(self){"Waiting for #{@adapter} pool to drain: #{@pool}"}
 			end
 			
 			@pool.close
